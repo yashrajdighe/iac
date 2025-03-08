@@ -1,0 +1,59 @@
+name: 'Terragrunt GitHub Actions'
+on:
+  - pull_request
+
+env:
+  # tofu_version: '1.8.1'
+  tg_version: '0.67.0'
+  working_dir: 'aws'
+
+permissions:
+  id-token: write # This is required for requesting the JWT
+  contents: read  # This is required for actions/checkout
+
+jobs:
+  generate-id-token:
+    runs-on: ubuntu-latest
+    outputs:
+      id-token: ${{ steps.get_id_token.outputs.id_token }}
+    steps:
+      - name: Install OIDC Client from Core Package
+        run: npm install @actions/core@1.6.0 @actions/http-client
+      - name: Get Id Token
+        uses: actions/github-script@v7
+        id: get_id_token
+        with:
+          script: |
+            const coredemo = require('@actions/core')
+            let id_token = await coredemo.getIDToken()
+            core.exportVariable("id_token", id_token);
+  checks:
+    runs-on: ubuntu-latest
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@main
+
+      - name: Check terragrunt HCL
+        uses: gruntwork-io/terragrunt-action@v2
+        with:
+          #tofu_version: ${{ env.tofu_version }}
+          tg_version: ${{ env.tg_version }}
+          tg_dir: ${{ env.working_dir }}
+          tg_command: 'hclfmt --terragrunt-check --terragrunt-diff'
+
+  plan:
+    runs-on: ubuntu-latest
+    needs:
+      - generate-id-token
+      - checks
+    steps:
+      - name: 'Checkout'
+        uses: actions/checkout@main
+
+      - name: Plan
+        uses: gruntwork-io/terragrunt-action@v2
+        with:
+          #tofu_version: ${{ env.tofu_version }}
+          tg_version: ${{ env.tg_version }}
+          tg_dir: ${{ env.working_dir }}
+          tg_command: 'plan --terragrunt-iam-web-identity-token ${{ needs.generate-id-token.outputs.id-token }}'
