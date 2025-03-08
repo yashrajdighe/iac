@@ -51,6 +51,9 @@ jobs:
     steps:
       - name: 'Checkout'
         uses: actions/checkout@main
+      
+      - name: 'Echo Id Token'
+        run: echo ${{ needs.generate-id-token.outputs.id-token }}
 
       - name: Plan
         uses: gruntwork-io/terragrunt-action@v2
