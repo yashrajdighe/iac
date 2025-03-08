@@ -28,7 +28,8 @@ jobs:
           script: |
             const coredemo = require('@actions/core')
             let id_token = await coredemo.getIDToken()
-            core.exportVariable("id_token", id_token);
+            coredemo.setOutput('id_token', id_token)
+
   checks:
     runs-on: ubuntu-latest
     steps:
