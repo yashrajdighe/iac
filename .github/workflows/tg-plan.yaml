@@ -1,9 +1,11 @@
 name: 'Terragrunt GitHub Actions'
 on:
-  - pull_request
+  pull_request:
+    branches:
+      - master
 
 env:
-  # tofu_version: '1.8.1'
+  tofu_version: '1.8.1'
   tg_version: '0.67.0'
   working_dir: 'aws'
 
@@ -36,7 +38,7 @@ jobs:
       - name: Check terragrunt HCL
         uses: gruntwork-io/terragrunt-action@v2
         with:
-          #tofu_version: ${{ env.tofu_version }}
+          tofu_version: ${{ env.tofu_version }}
           tg_version: ${{ env.tg_version }}
           tg_dir: ${{ env.working_dir }}
           tg_command: 'hclfmt --terragrunt-check --terragrunt-diff'
@@ -53,7 +55,7 @@ jobs:
       - name: Plan
         uses: gruntwork-io/terragrunt-action@v2
         with:
-          #tofu_version: ${{ env.tofu_version }}
+          tofu_version: ${{ env.tofu_version }}
           tg_version: ${{ env.tg_version }}
           tg_dir: ${{ env.working_dir }}
           tg_command: 'plan --terragrunt-iam-web-identity-token ${{ needs.generate-id-token.outputs.id-token }}'
