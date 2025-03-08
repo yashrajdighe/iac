@@ -8,9 +8,9 @@ locals {
   env           = local.env_vars.locals.env
   platform      = "aws" # optional
   #host          = "<host>" # optional
-  project       = "iac" # optional
-  creator       = "terraform/terragrunt"
-  team          = "devops"
+  project = "iac" # optional
+  creator = "terraform/terragrunt"
+  team    = "devops"
 }
 
 generate "provider" {
