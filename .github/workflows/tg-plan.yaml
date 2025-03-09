@@ -29,6 +29,9 @@ jobs:
             const coredemo = require('@actions/core')
             let id_token = await coredemo.getIDToken()
             coredemo.setOutput('id_token', id_token)
+      - name: debug
+        run: |
+          echo ${{ steps.get_id_token.outputs.id_token }}
 
   checks:
     runs-on: ubuntu-latest
