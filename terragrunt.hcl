@@ -7,7 +7,6 @@ locals {
   aws_region    = local.region_vars.locals.aws_region
   env           = local.env_vars.locals.env
   platform      = "aws" # optional
-  #host          = "<host>" # optional
   project = "iac" # optional
   creator = "terraform/terragrunt"
   team    = "devops"
@@ -22,7 +21,6 @@ generate "provider" {
             default_tags {
                 tags = {
                     platform = "${local.platform}"
-                    #host = "${local.host}"
                     project = "${local.project}"
                     creator = "${local.creator}"
                     team = "${local.team}"
