@@ -7,7 +7,7 @@ on:
 env:
   tofu_version: '1.8.1'
   tg_version: '0.67.0'
-  working_dir: './'
+  working_dir: 'aws'
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -65,4 +65,4 @@ jobs:
           tofu_version: ${{ env.tofu_version }}
           tg_version: ${{ env.tg_version }}
           tg_dir: ${{ env.working_dir }}
-          tg_command: 'plan --terragrunt-iam-web-identity-token ${{ needs.generate-id-token.outputs.id-token }}'
+          tg_command: 'run-all plan --terragrunt-iam-web-identity-token ${{ needs.generate-id-token.outputs.id-token }}'
