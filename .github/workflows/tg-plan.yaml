@@ -17,7 +17,7 @@ jobs:
   generate-id-token:
     runs-on: ubuntu-latest
     outputs:
-      id-token: 'test'
+      id-token: ${{ steps.get_id_token.outputs.id_token }}
     steps:
       - name: Install OIDC Client from Core Package
         run: npm install @actions/core@1.6.0 @actions/http-client
@@ -31,7 +31,7 @@ jobs:
             coredemo.setOutput('id_token', id_token)
       - name: debug
         run: |
-          echo ${{ steps.get_id_token.outputs.id_token }}
+          echo "::add-mask::${{ steps.get_id_token.outputs.id_token }}"
 
   checks:
     runs-on: ubuntu-latest
