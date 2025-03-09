@@ -43,6 +43,8 @@ generate "provider" {
     EOF
 }
 
+iam_role = "${local.iam_role}"
+
 remote_state {
   backend = "s3"
   config = {
