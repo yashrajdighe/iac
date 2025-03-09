@@ -19,7 +19,7 @@ include "account" {
 }
 
 terraform {
-  source = "terraform-aws-modules/vpc/aws"
+  source = "hashicorp/terraform-aws-modules/vpc/aws"
 }
 
 #dependency "<resource-name>" {
