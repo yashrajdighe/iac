@@ -49,6 +49,8 @@ jobs:
 
   plan:
     runs-on: ubuntu-latest
+    env:
+      TERRAGRUNT_IAM_WEB_IDENTITY_TOKEN: ${{ needs.generate-id-token.outputs.id-token }}
     needs:
       - generate-id-token
       - checks
@@ -65,4 +67,4 @@ jobs:
           tofu_version: ${{ env.tofu_version }}
           tg_version: ${{ env.tg_version }}
           tg_dir: ${{ env.working_dir }}
-          tg_command: 'run-all plan --terragrunt-iam-web-identity-token ${{ needs.generate-id-token.outputs.id-token }}'
+          tg_command: 'run-all plan'
