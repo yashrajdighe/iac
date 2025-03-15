@@ -5,9 +5,9 @@ on:
       - main
 
 env:
-  tofu_version: '1.8.1'
-  tg_version: '0.67.0'
-  working_dir: 'aws'
+  TOFU_VERSION: '1.8.1'
+  TG_VERSION: '0.67.0'
+  WORKING_DIR: 'aws'
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -19,6 +19,6 @@ jobs:
     with:
       enable_oidc_debugger: true
       role_to_assume: ${{ vars.TERRAFORM_RO_IAM_ROLE }}
-      working_directory: ${{ env.working_dir }}
-      tofu_version: ${{ env.tofu_version }}
-      tg_version: ${{ env.tg_version }}
+      working_directory: ${{ env.WORKING_DIR }}
+      tofu_version: ${{ env.TOFU_VERSION }}
+      tg_version: ${{ env.TG_VERSION }}
