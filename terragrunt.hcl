@@ -7,9 +7,9 @@ locals {
   aws_region    = local.region_vars.locals.aws_region
   env           = local.env_vars.locals.env
   platform      = "aws" # optional
-  project = "iac" # optional
-  creator = "terraform/terragrunt"
-  team    = "devops"
+  project       = "iac" # optional
+  creator       = "terraform/terragrunt"
+  team          = "devops"
 }
 
 generate "provider" {
