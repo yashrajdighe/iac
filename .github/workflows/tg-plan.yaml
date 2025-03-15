@@ -14,59 +14,12 @@ permissions:
   contents: read  # This is required for actions/checkout
 
 jobs:
-  generate-id-token:
+  tg-plan:
     runs-on: ubuntu-latest
-    outputs:
-      id-token: ${{ steps.get_id_token.outputs.id_token }}
-    steps:
-      - name: Install OIDC Client from Core Package
-        run: npm install @actions/core@1.6.0 @actions/http-client
-      - name: Get Id Token
-        uses: actions/github-script@v7
-        id: get_id_token
-        with:
-          script: |
-            const coredemo = require('@actions/core')
-            let id_token = await coredemo.getIDToken()
-            coredemo.setOutput('id_token', id_token)
-      - name: debug
-        run: |
-          echo "::add-mask::${{ steps.get_id_token.outputs.id_token }}"
-
-  checks:
-    runs-on: ubuntu-latest
-    steps:
-      - name: 'Checkout'
-        uses: actions/checkout@main
-
-      - name: Check terragrunt HCL
-        uses: gruntwork-io/terragrunt-action@v2
-        with:
-          tofu_version: ${{ env.tofu_version }}
-          tg_version: ${{ env.tg_version }}
-          tg_dir: ${{ env.working_dir }}
-          tg_command: 'hclfmt --terragrunt-check --terragrunt-diff'
-
-  plan:
-    runs-on: ubuntu-latest
-    env:
-      TERRAGRUNT_IAM_WEB_IDENTITY_TOKEN: ${{ needs.generate-id-token.outputs.id-token }}
-      AWS_ACCESS_KEY_ID: test-key-id
-      AWS_SECRET_ACCESS_KEY: test-secret-key
-    needs:
-      - generate-id-token
-      - checks
-    steps:
-      - name: 'Checkout'
-        uses: actions/checkout@main
-      
-      - name: 'Echo Id Token'
-        run: echo ${{ needs.generate-id-token.outputs.id-token }}
-
-      - name: Plan
-        uses: gruntwork-io/terragrunt-action@v2
-        with:
-          tofu_version: ${{ env.tofu_version }}
-          tg_version: ${{ env.tg_version }}
-          tg_dir: ${{ env.working_dir }}
-          tg_command: 'run-all plan'
+    uses: yashrajdighe/github-actions-reusable-workflows/.github/workflows/tg-plan.yaml@refs/heads/main
+    with:
+      enable-oidc-debugger: true
+      role-to-assume: var.TERRAFORM_RO_IAM_ROLE
+      working-directory: 'aws'
+      tofu-version: '1.8.1'
+      tg-version: '0.67.0'
