@@ -3,8 +3,9 @@ locals {
   region_vars   = read_terragrunt_config(find_in_parent_folders("region.hcl"))
   env_vars      = read_terragrunt_config(find_in_parent_folders("env.hcl"))
   iam_role      = get_terraform_command() == "apply" ? local.account_vars.locals.iam_role : local.account_vars.locals.iam_role_ro
-  bucket_region = "us-east-1" # to be dynamic
+  bucket_region = "us-east-1" # always be in north virginia for state bucket
   aws_region    = local.region_vars.locals.aws_region
+  account_name  = local.account_vars.locals.account_name
   env           = local.env_vars.locals.env
   platform      = "aws" # optional
   project       = "iac" # optional
@@ -49,10 +50,10 @@ remote_state {
   backend = "s3"
   config = {
     encrypt        = true
-    bucket         = "${local.platform}-${local.project}-tf-states"
+    bucket         = "${local.account_name}-${local.platform}-${local.project}-tf-states"
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = "${local.bucket_region}"
-    dynamodb_table = "${local.platform}-${local.project}-tf-locks"
+    dynamodb_table = "${local.account_name}-${local.platform}-${local.project}-tf-locks"
   }
   generate = {
     path      = "backend.tf"
