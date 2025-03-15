@@ -15,7 +15,6 @@ permissions:
 
 jobs:
   tg-plan:
-    runs-on: ubuntu-latest
     uses: yashrajdighe/github-actions-reusable-workflows/.github/workflows/tg-plan.yaml@add-tg-plan-workflow
     with:
       enable-oidc-debugger: true
