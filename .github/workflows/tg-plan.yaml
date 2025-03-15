@@ -19,6 +19,6 @@ jobs:
     with:
       enable_oidc_debugger: true
       role_to_assume: ${{ vars.TERRAFORM_RO_IAM_ROLE }}
-      working_directory: 'aws'
-      tofu_version: '1.8.1'
-      tg_version: '0.67.0'
+      working_directory: ${{ env.working_dir }}
+      tofu_version: ${{ env.tofu_version }}
+      tg_version: ${{ env.tg_version }}
