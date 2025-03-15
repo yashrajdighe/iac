@@ -18,6 +18,8 @@ jobs:
   tg-plan:
     uses: yashrajdighe/github-actions-reusable-workflows/.github/workflows/tg-plan.yaml@add-tg-plan-workflow
     permissions:
+      token: write
+      contents: read
       pull-requests: write
     with:
       enable_oidc_debugger: false
