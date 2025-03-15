@@ -18,7 +18,7 @@ jobs:
     uses: yashrajdighe/github-actions-reusable-workflows/.github/workflows/tg-plan.yaml@add-tg-plan-workflow
     with:
       enable_oidc_debugger: true
-      role_to_assume: ${{ var.TERRAFORM_RO_IAM_ROLE }}
+      role_to_assume: ${{ vars.TERRAFORM_RO_IAM_ROLE }}
       working_directory: 'aws'
       tofu_version: '1.8.1'
       tg_version: '0.67.0'
