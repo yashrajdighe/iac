@@ -16,10 +16,11 @@ permissions:
 jobs:
   tg-plan:
     uses: yashrajdighe/github-actions-reusable-workflows/.github/workflows/tg-plan.yaml@add-tg-plan-workflow
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
     with:
       enable_oidc_debugger: true
       role_to_assume: ${{ vars.TERRAFORM_RO_IAM_ROLE }}
       working_directory: 'aws'
       tofu_version: '1.8.1'
       tg_version: '0.67.0'
-      github_token: ${{ secrets.GITHUB_TOKEN }}
