@@ -22,3 +22,4 @@ jobs:
       working_directory: 'aws'
       tofu_version: '1.8.1'
       tg_version: '0.67.0'
+      github_token: ${{ secrets.GITHUB_TOKEN }}
