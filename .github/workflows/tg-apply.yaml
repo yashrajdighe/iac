@@ -7,6 +7,8 @@ on:
     paths:
       - 'infrastructure/**'
       - 'modules/**'
+      - '.github/workflows/tg-plan.yaml'
+      - '.github/workflows/tg-apply.yaml'
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
