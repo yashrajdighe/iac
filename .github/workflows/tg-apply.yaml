@@ -1,5 +1,5 @@
 ---
-name: 'Terragrunt GitHub Actions'
+name: 'Terragrunt GitHub Actions Apply'
 on:
   push:
     branches:

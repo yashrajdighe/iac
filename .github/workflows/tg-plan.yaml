@@ -1,5 +1,5 @@
 ---
-name: 'Terragrunt GitHub Actions'
+name: 'Terragrunt GitHub Actions Plan'
 on:
   pull_request:
     branches:
