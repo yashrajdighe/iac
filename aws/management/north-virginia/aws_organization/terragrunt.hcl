@@ -19,5 +19,5 @@ include "account" {
 }
 
 terraform {
-  source = "../../../modules/aws/aws_organization"
+  source = "../../../../modules/aws/aws_organization"
 }
