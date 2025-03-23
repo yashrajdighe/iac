@@ -10,6 +10,10 @@ on:
       - '.github/workflows/tg-plan.yaml'
       - '.github/workflows/tg-apply.yaml'
 
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
@@ -22,7 +26,7 @@ jobs:
   tg-apply:
     uses: yashrajdighe/github-actions-reusable-workflows/.github/workflows/tg-apply.yaml@main
     with:
-      enable_oidc_debugger: false
+      enable_oidc_debugger: true
       role_to_assume: ${{ vars.TERRAFORM_IAM_ROLE }}
       working_directory: 'infrastructure/aws'
       tofu_version: '1.8.1'
