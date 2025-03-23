@@ -1,7 +1,7 @@
 ---
-name: 'Terragrunt GitHub Actions Apply'
+name: 'Terragrunt GitHub Actions Plan'
 on:
-  push:
+  pull_request:
     branches:
       - main
     paths:
@@ -19,13 +19,12 @@ permissions:
   pull-requests: write # This is required for the tg-comment action
 
 jobs:
-  tg-apply:
-    uses: yashrajdighe/github-actions-reusable-workflows/.github/workflows/tg-apply.yaml@main
+  tg-plan:
+    uses: yashrajdighe/github-actions-reusable-workflows/.github/workflows/tg-plan.yaml@main
     with:
       enable_oidc_debugger: false
-      role_to_assume: ${{ vars.TERRAFORM_IAM_ROLE }}
+      role_to_assume: ${{ vars.TERRAFORM_RO_IAM_ROLE }}
       working_directory: 'infrastructure/aws'
       tofu_version: '1.8.1'
       tg_version: '0.67.0'
-      github_environment: 'terraform'
     secrets: inherit

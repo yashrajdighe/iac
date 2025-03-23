@@ -1,0 +1,30 @@
+---
+repos:
+  - repo: https://github.com/antonbabenko/pre-commit-terraform
+    rev: v1.83.5
+    hooks:
+      - id: terraform_fmt
+      - id: terragrunt_fmt
+
+  - repo: https://github.com/pre-commit/pre-commit-hooks
+    rev: v4.5.0
+    hooks:
+      - id: check-yaml
+      - id: end-of-file-fixer
+      - id: trailing-whitespace
+
+  - repo: https://github.com/adrienverge/yamllint
+    rev: v1.35.1
+    hooks:
+      - id: yamllint
+        args: [--format, parsable, --strict]
+        files: \.(yaml|yml)$
+
+  - repo: local
+    hooks:
+      - id: terragrunt-hclfmt
+        name: terragrunt hclfmt
+        description: Format terragrunt HCL files with 'terragrunt hclfmt'
+        entry: terragrunt hclfmt
+        language: system
+        files: \.hcl$
