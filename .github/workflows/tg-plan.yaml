@@ -22,7 +22,7 @@ jobs:
     with:
       enable_oidc_debugger: false
       role_to_assume: ${{ vars.TERRAFORM_RO_IAM_ROLE }}
-      working_directory: 'infrastructure'
+      working_directory: 'infrastructure/aws'
       tofu_version: '1.8.1'
       tg_version: '0.67.0'
     secrets: inherit
