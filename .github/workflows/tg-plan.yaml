@@ -4,11 +4,11 @@ on:
   pull_request:
     branches:
       - main
+    paths:
+      - 'infrastructure/**'
+      - 'modules/**'
 
 env:
-  TOFU_VERSION: '1.8.1'
-  TG_VERSION: '0.67.0'
-  WORKING_DIR: 'aws'
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
 
 permissions:
@@ -22,7 +22,7 @@ jobs:
     with:
       enable_oidc_debugger: false
       role_to_assume: ${{ vars.TERRAFORM_RO_IAM_ROLE }}
-      working_directory: 'aws'
+      working_directory: 'infrastructure'
       tofu_version: '1.8.1'
       tg_version: '0.67.0'
     secrets: inherit
