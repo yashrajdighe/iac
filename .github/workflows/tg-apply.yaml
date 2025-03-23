@@ -1,0 +1,29 @@
+---
+    name: 'Terragrunt GitHub Actions'
+    on:
+      push:
+        branches:
+          - main
+        paths:
+          - 'infrastructure/**'
+          - 'modules/**'
+    
+    env:
+      GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+    
+    permissions:
+      id-token: write # This is required for requesting the JWT
+      contents: read  # This is required for actions/checkout
+      pull-requests: write # This is required for the tg-comment action
+    
+    jobs:
+      tg-apply:
+        uses: yashrajdighe/github-actions-reusable-workflows/.github/workflows/tg-apply.yaml@main
+        with:
+          enable_oidc_debugger: false
+          role_to_assume: ${{ vars.TERRAFORM_IAM_ROLE }}
+          working_directory: 'infrastructure'
+          tofu_version: '1.8.1'
+          tg_version: '0.67.0'
+          github_environment: 'terraform'
+        secrets: inherit
