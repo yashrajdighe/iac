@@ -1,0 +1,46 @@
+---
+name: 'Terragrunt Import Resources'
+
+on:
+  workflow_dispatch:
+    inputs:
+      working_directory:
+        description: 'Working directory for terragrunt'
+        required: true
+        type: string
+        default: 'infrastructure/aws'
+      resource_name:
+        description: 'Name of the resource to import'
+        required: true
+        type: string
+      resource_id:
+        description: 'ID of the resource to import'
+        required: true
+        type: string
+      enable_oidc_debugger:
+        description: 'Enable OIDC Debugger'
+        required: false
+        type: boolean
+        default: false
+
+concurrency:
+  group: terraform
+  cancel-in-progress: false
+
+env:
+  GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+
+permissions:
+  id-token: write
+  contents: read
+
+jobs:
+  tg-import:
+    uses: yashrajdighe/github-actions-reusable-workflows/.github/workflows/tg-import.yaml@main
+    with:
+      working_directory: ${{ inputs.working_directory }}
+      role_to_assume: ${{ vars.TERRAFORM_IAM_ROLE }}
+      resource_name: ${{ inputs.resource_name }}
+      resource_id: ${{ inputs.resource_id }}
+      enable_oidc_debugger: ${{ inputs.enable_oidc_debugger }}
+    secrets: inherit
