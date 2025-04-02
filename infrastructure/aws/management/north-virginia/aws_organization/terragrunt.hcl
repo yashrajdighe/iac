@@ -22,11 +22,6 @@ terraform {
   source = "../../../../../modules/aws/aws_organization"
 }
 
-import {
-  to = aws_organizations_organization.org
-  id = "o-xxxxxxxxxx" # Replace with your actual AWS Organization ID
-}
-
 inputs = {
   aws_service_access_principals = [
     "cloudtrail.amazonaws.com",
