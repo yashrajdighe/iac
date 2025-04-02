@@ -4,6 +4,6 @@ resource "aws_organizations_organization" "org" {
 }
 
 import {
-  id = "o-xxxxxxxxxx" # Replace with your actual AWS Organization ID
+  id = "r-kfvz"
   to = aws_organizations_organization.org
 }
