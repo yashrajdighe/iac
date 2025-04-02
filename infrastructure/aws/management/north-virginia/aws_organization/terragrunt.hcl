@@ -21,3 +21,11 @@ include "account" {
 terraform {
   source = "../../../../../modules/aws/aws_organization"
 }
+
+inputs = {
+  aws_service_access_principals = [
+    "cloudtrail.amazonaws.com",
+    "config.amazonaws.com"
+  ]
+  feature_set = "ALL"
+}

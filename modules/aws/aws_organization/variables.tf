@@ -2,6 +2,8 @@ variable "aws_service_access_principals" {
   description = "List of AWS service principal names for which you want to enable integration with your organization"
   type        = list(string)
   default = [
+    "member.org.stacksets.cloudformation.amazonaws.com",
+    "sso.amazonaws.com",
     "cloudtrail.amazonaws.com",
     "config.amazonaws.com",
   ]
