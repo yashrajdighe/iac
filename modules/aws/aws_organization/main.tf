@@ -4,6 +4,6 @@ resource "aws_organizations_organization" "org" {
 }
 
 import {
-  id = "r-kfvz"
+  id = "o-4s1jxdnpu3"
   to = aws_organizations_organization.org
 }
