@@ -35,8 +35,6 @@ generate "provider" {
     EOF
 }
 
-iam_role = "${local.iam_role}"
-
 remote_state {
   backend = "s3"
   config = {
@@ -45,6 +43,9 @@ remote_state {
     key            = "${path_relative_to_include()}/terraform.tfstate"
     region         = "${local.bucket_region}"
     dynamodb_table = "${local.account_name}-${local.platform}-${local.project}-tf-locks"
+    assume_role = {
+      role_arn = "${local.iam_role}"
+    }
   }
   generate = {
     path      = "backend.tf"
