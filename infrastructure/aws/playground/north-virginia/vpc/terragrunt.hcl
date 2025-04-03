@@ -40,7 +40,7 @@ terraform {
 
 inputs = {
   # define module inputs here
-  create_vpc = true
+  create_vpc = false
   name       = "my-vpc"
   cidr       = "10.0.0.0/16"
 
