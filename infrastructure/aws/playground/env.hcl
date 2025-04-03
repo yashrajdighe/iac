@@ -1,3 +1,3 @@
 locals {
-  env = "management"
+  env = "playground"
 }
