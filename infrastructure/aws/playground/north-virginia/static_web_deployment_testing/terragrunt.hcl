@@ -19,7 +19,7 @@ include "account" {
 }
 
 terraform {
-  source = "${get_parent_terragrunt_dir()}/../modules/static0web-deployment"
+  source = "../../../../../modules/aws/static-web-deployment"
 }
 
 #dependency "<resource-name>" {

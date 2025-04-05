@@ -35,7 +35,7 @@ resource "aws_s3_bucket_policy" "this" {
 }
 
 resource "aws_cloudfront_distribution" "this" {
-  count = var.enable_cloudfront_distribution ? 1 : 0
+  count = var.create_static_web_deployment ? 1 : 0
 
   depends_on = [aws_s3_bucket.this]
 
@@ -87,6 +87,7 @@ resource "aws_cloudfront_distribution" "this" {
 }
 
 resource "aws_cloudfront_origin_access_control" "this" {
+  count                             = var.create_static_web_deployment ? 1 : 0
   name                              = var.static_web_deployment_name
   description                       = "Policy for ${var.static_web_deployment_name}"
   origin_access_control_origin_type = "s3"
