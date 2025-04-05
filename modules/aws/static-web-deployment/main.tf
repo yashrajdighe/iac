@@ -53,6 +53,7 @@ resource "aws_cloudfront_distribution" "this" {
     viewer_protocol_policy = "redirect-to-https"
     allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods         = ["GET", "HEAD"]
+    cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # AWS Managed Cache Policy: CachingDisabled
   }
 
   dynamic "ordered_cache_behavior" {
@@ -63,6 +64,7 @@ resource "aws_cloudfront_distribution" "this" {
       allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
       cached_methods         = ["GET", "HEAD"]
       viewer_protocol_policy = "redirect-to-https"
+      cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # AWS Managed Cache Policy: CachingDisabled
     }
   }
 
