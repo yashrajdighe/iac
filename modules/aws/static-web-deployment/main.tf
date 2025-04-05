@@ -1,21 +1,8 @@
-data "aws_s3_bucket" "bucket_exists" {
-  for_each = var.create_static_web_deployment ? { for origin in var.origins : origin.bucket_suffix => origin } : {}
-  bucket   = local.bucket_names[each.key]
-}
-
 resource "aws_s3_bucket" "this" {
   for_each = var.create_static_web_deployment ? { for origin in var.origins : origin.bucket_suffix => origin } : {}
 
   bucket = local.bucket_names[each.key]
-
-  tags = var.tags
-
-  lifecycle {
-    precondition {
-      condition     = !can(data.aws_s3_bucket.bucket_exists[each.key].id)
-      error_message = "S3 bucket ${local.bucket_names[each.key]} already exists. Please use a different bucket name."
-    }
-  }
+  tags   = var.tags
 }
 
 resource "aws_s3_bucket_policy" "this" {
