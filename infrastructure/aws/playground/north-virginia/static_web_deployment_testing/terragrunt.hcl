@@ -39,7 +39,7 @@ terraform {
 #}
 
 inputs = {
-  create_static_web_deployment   = true
+  create_static_web_deployment   = false
   static_web_deployment_name     = "my-static-website"
   enable_cloudfront_distribution = true
 

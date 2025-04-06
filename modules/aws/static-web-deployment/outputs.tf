@@ -21,5 +21,5 @@ output "cloudfront_distributions" {
 
 output "origin_access_control_id" {
   description = "ID of the CloudFront Origin Access Control"
-  value       = aws_cloudfront_origin_access_control.this[0].id
+  value       = try(coalesce(one(aws_cloudfront_origin_access_control.this[*].id), null), null)
 }
