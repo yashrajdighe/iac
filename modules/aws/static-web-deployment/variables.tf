@@ -38,6 +38,7 @@ variable "ordered_cache_behaviors" {
     path_pattern     = string
     target_origin_id = string
   }))
+  default = []
 }
 
 variable "default_root_object" {
