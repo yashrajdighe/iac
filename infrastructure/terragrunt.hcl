@@ -9,7 +9,7 @@ locals {
   env           = local.env_vars.locals.env
   platform      = "aws" # optional
   project       = "iac" # optional
-  creator       = "terraform/terragrunt"
+  creator       = "tofu/terragrunt"
   team          = "devops"
 }
 
