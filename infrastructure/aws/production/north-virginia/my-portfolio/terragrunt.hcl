@@ -40,7 +40,7 @@ terraform {
 
 inputs = {
   create_static_web_deployment   = true
-  static_web_deployment_name     = "my-portfolio-app"
+  static_web_deployment_name     = "my-portfolio-app-${include.env.locals.env}"
   enable_cloudfront_distribution = true
 
   origins = [
