@@ -45,21 +45,19 @@ resource "aws_eip" "this" {
 }
 
 resource "aws_route_table" "private" {
-  count    = var.create_vpc ? length(var.private_subnets) : 0
-  for_each = tomap({ for idx, cidr in var.private_subnets : idx => cidr })
+  for_each = var.create_vpc ? tomap({ for idx, cidr in var.private_subnets : idx => cidr }) : {}
   vpc_id   = aws_vpc.this[0].id
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = var.create_nat_gateway != "none" ? element(aws_nat_gateway.this.*.id, 0) : null
+    nat_gateway_id = var.create_nat_gateway != "none" ? aws_nat_gateway.this[0].id : null
   }
 
   tags = var.tags
 }
 
 resource "aws_route_table_association" "private" {
-  count          = var.create_vpc ? length(aws_subnet.private) : 0
-  for_each       = var.create_vpc ? aws_subnet.private : {}
+  for_each       = var.create_vpc ? tomap({ for idx, subnet in aws_subnet.private : idx => subnet }) : {}
   subnet_id      = each.value.id
   route_table_id = aws_route_table.private[each.key].id
 }
@@ -92,16 +90,14 @@ resource "aws_subnet" "db" {
 }
 
 resource "aws_route_table" "db" {
-  count    = var.create_vpc ? length(var.db_subnets) : 0
-  for_each = tomap({ for idx, cidr in var.db_subnets : idx => cidr })
+  for_each = var.create_vpc ? tomap({ for idx, cidr in var.db_subnets : idx => cidr }) : {}
   vpc_id   = aws_vpc.this[0].id
 
   tags = var.tags
 }
 
 resource "aws_route_table_association" "db" {
-  count          = var.create_vpc ? length(aws_subnet.db) : 0
-  for_each       = var.create_vpc ? aws_subnet.db : {}
+  for_each       = var.create_vpc ? tomap({ for idx, subnet in aws_subnet.db : idx => subnet }) : {}
   subnet_id      = each.value.id
   route_table_id = aws_route_table.db[each.key].id
 }
