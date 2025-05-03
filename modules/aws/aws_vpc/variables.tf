@@ -36,3 +36,15 @@ EOT
   type        = string
   default     = "none"
 }
+
+variable "create_vpc" {
+  description = "Toggle to create the VPC and associated resources"
+  type        = bool
+  default     = true
+}
+
+variable "tags" {
+  description = "Tags to apply to the resources"
+  type        = map(string)
+  default     = {}
+}
