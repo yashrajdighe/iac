@@ -31,7 +31,11 @@ resource "aws_route_table_association" "public" {
 }
 
 resource "aws_nat_gateway" "this" {
-  for_each      = var.create_vpc && var.create_nat_gateway != "none" ? tomap({ for idx, subnet in aws_subnet.public : idx => subnet }) : {}
+  for_each = var.create_vpc && var.create_nat_gateway != "none" ? (
+    var.create_nat_gateway == "per_az" 
+    ? tomap({ for idx, subnet in aws_subnet.public : idx => subnet }) 
+    : tomap({ "single" : aws_subnet.public[0] })
+  ) : {}
   allocation_id = aws_eip.this[each.key].id
   subnet_id     = each.value.id
 
@@ -39,8 +43,12 @@ resource "aws_nat_gateway" "this" {
 }
 
 resource "aws_eip" "this" {
-  for_each = var.create_vpc && var.create_nat_gateway != "none" ? tomap({ for idx, subnet in aws_subnet.public : idx => subnet }) : {}
-  vpc      = true
+  for_each = var.create_vpc && var.create_nat_gateway != "none" ? (
+    var.create_nat_gateway == "per_az" 
+    ? tomap({ for idx, subnet in aws_subnet.public : idx => subnet }) 
+    : tomap({ "single" : aws_subnet.public[0] })
+  ) : {}
+  vpc = true
 }
 
 resource "aws_route_table" "private" {
@@ -49,7 +57,7 @@ resource "aws_route_table" "private" {
 
   route {
     cidr_block     = "0.0.0.0/0"
-    nat_gateway_id = var.create_nat_gateway != "none" ? aws_nat_gateway.this[0].id : null
+    nat_gateway_id = var.create_nat_gateway != "none" ? aws_nat_gateway.this[each.key != "single" ? each.key : "single"].id : null
   }
 
   tags = var.tags
