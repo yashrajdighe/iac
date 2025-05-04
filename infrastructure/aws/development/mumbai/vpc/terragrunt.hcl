@@ -19,7 +19,7 @@ include "account" {
 }
 
 terraform {
-  source = "../../../../../modules/aws/static_web_deployment"
+  source = "../../../../../modules/aws/aws_vpc"
 }
 
 #dependency "<resource-name>" {
@@ -39,21 +39,10 @@ terraform {
 #}
 
 inputs = {
-  create_static_web_deployment   = true
-  static_web_deployment_name     = "my-portfolio-app-${include.env.locals.env}"
-  enable_cloudfront_distribution = true
-
-  origins = [
-    {
-      path          = "/"
-      origin_id     = "root"
-      bucket_suffix = "root"
-    }
-  ]
-
-  default_cache_behavior = {
-    target_origin_id = "root"
-  }
-
-  default_root_object = "index.html"
+  create_vpc      = true
+  vpc_name        = "dev-vpc"
+  vpc_cidr_block  = "10.0.0.0/16"
+  public_subnets  = ["10.0.0.0/24", "10.0.1.0/24", "10.0.2.0/24"]
+  private_subnets = ["10.0.10.0/24", "10.0.11.0/24", "10.0.12.0/24"]
+  db_subnets      = ["10.0.20.0/24", "10.0.21.0/24", "10.0.22.0/24"]
 }

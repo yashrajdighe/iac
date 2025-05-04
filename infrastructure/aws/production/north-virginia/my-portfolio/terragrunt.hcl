@@ -19,7 +19,7 @@ include "account" {
 }
 
 terraform {
-  source = "../../../../../modules/aws/static-web-deployment"
+  source = "../../../../../modules/aws/static_web_deployment"
 }
 
 #dependency "<resource-name>" {
