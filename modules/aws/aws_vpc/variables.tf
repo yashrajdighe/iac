@@ -31,10 +31,9 @@ variable "create_nat_gateway" {
 Option to control NAT gateway creation:
 - "single": Create a single NAT gateway.
 - "per_az": Create one NAT gateway per availability zone.
-- "none": Do not create any NAT gateway.
 EOT
   type        = string
-  default     = "none"
+  default     = "single"
 }
 
 variable "create_vpc" {
