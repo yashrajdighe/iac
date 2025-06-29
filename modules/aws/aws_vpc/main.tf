@@ -40,7 +40,7 @@ resource "aws_nat_gateway" "this" {
 
 resource "aws_eip" "this" {
   for_each = var.create_vpc && var.create_nat_gateway != "none" ? tomap({ for idx, subnet in aws_subnet.public : idx => subnet }) : {}
-  vpc      = true
+  domain   = "vpc"
 }
 
 resource "aws_route_table" "private" {
