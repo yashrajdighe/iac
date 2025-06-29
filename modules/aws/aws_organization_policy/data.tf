@@ -10,5 +10,13 @@ data "aws_iam_policy_document" "this" {
         identifiers = principals.value.identifiers
       }
     }
+    dynamic "condition" {
+      for_each = var.policy_content.conditions != null ? var.policy_content.conditions : []
+      content {
+        test     = condition.value.test
+        variable = condition.value.variable
+        values   = condition.value.values
+      }
+    }
   }
 }

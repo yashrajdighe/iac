@@ -23,12 +23,41 @@ terraform {
 }
 
 inputs = {
-  name        = "deny-ec2"
+  name        = "deny_all_create_without_tags"
   description = "Deny all EC2 actions"
   policy_content = {
     effect    = "Deny"
-    actions   = ["ec2:*"]
+    actions   = ["*"]
     resources = ["*"]
     # principal is optional for SCPs, so you can omit it
+    condition {
+      test     = "Null"
+      variable = "aws:RequestTag/environment"
+      values   = ["true"]
+    }
+
+    condition {
+      test     = "Null"
+      variable = "aws:RequestTag/creator"
+      values   = ["true"]
+    }
+    
+    condition {
+      test     = "Null"
+      variable = "aws:RequestTag/platform"
+      values   = ["true"]
+    }
+    
+    condition {
+      test     = "Null"
+      variable = "aws:RequestTag/project"
+      values   = ["true"]
+    }
+    
+    condition {
+      test     = "Null"
+      variable = "aws:RequestTag/team"
+      values   = ["true"]
+    }
   }
 }

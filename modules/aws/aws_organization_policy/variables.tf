@@ -10,12 +10,13 @@ variable "description" {
 }
 
 variable "policy_content" {
-  description = "Policy statement block for the SCP. Should be a map with keys: effect, actions, resources, principal (optional)."
+  description = "Policy statement block for the SCP. Should be a map with keys: effect, actions, resources, principal (optional), conditions (optional)."
   type = object({
-    effect    = string
-    actions   = list(string)
-    resources = list(string)
-    principal = optional(any)
+    effect     = string
+    actions    = list(string)
+    resources  = list(string)
+    principal  = optional(any)
+    conditions = optional(any)
   })
 }
 
