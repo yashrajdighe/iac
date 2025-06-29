@@ -24,7 +24,7 @@ terraform {
 
 inputs = {
   name        = "deny_all_create_without_tags"
-  description = "Deny all EC2 actions"
+  description = "Deny all create actions without tags"
   policy_content = {
     effect    = "Deny"
     actions   = ["*"]
