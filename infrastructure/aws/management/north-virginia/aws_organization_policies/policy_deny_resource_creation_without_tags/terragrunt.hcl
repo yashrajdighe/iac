@@ -19,7 +19,7 @@ include "account" {
 }
 
 terraform {
-  source = "../../../../../modules/aws/aws_organization_policy"
+  source = "../../../../../../modules/aws/aws_organization_policy"
 }
 
 inputs = {
