@@ -30,34 +30,32 @@ inputs = {
     actions   = ["*"]
     resources = ["*"]
     # principal is optional for SCPs, so you can omit it
-    condition = {
-      test     = "Null"
-      variable = "aws:RequestTag/environment"
-      values   = ["true"]
-    }
-
-    condition = {
-      test     = "Null"
-      variable = "aws:RequestTag/creator"
-      values   = ["true"]
-    }
-
-    condition = {
-      test     = "Null"
-      variable = "aws:RequestTag/platform"
-      values   = ["true"]
-    }
-
-    condition = {
-      test     = "Null"
-      variable = "aws:RequestTag/project"
-      values   = ["true"]
-    }
-
-    condition = {
-      test     = "Null"
-      variable = "aws:RequestTag/team"
-      values   = ["true"]
-    }
+    conditions = [
+      {
+        test     = "Null"
+        variable = "aws:RequestTag/environment"
+        values   = ["true"]
+      },
+      {
+        test     = "Null"
+        variable = "aws:RequestTag/creator"
+        values   = ["true"]
+      },
+      {
+        test     = "Null"
+        variable = "aws:RequestTag/platform"
+        values   = ["true"]
+      },
+      {
+        test     = "Null"
+        variable = "aws:RequestTag/project"
+        values   = ["true"]
+      },
+      {
+        test     = "Null"
+        variable = "aws:RequestTag/team"
+        values   = ["true"]
+      }
+    ]
   }
 }
