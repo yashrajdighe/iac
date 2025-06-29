@@ -7,7 +7,7 @@ resource "aws_organizations_policy" "this" {
 }
 
 resource "aws_organizations_policy_attachment" "this" {
-  for_each  = toset(var.policy_attachments)
+  count     = length(var.policy_attachments)
   policy_id = aws_organizations_policy.this.id
-  target_id = var.policy_attachments[each.key]
+  target_id = var.policy_attachments[count.index]
 }
