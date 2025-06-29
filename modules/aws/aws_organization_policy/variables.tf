@@ -26,6 +26,12 @@ variable "policy_attachments" {
   default     = []
 }
 
+variable "enabled" {
+  description = "Whether to enable (create) the policy and its attachments."
+  type        = bool
+  default     = true
+}
+
 variable "tags" {
   description = "A map of tags to assign to the policy."
   type        = map(string)
