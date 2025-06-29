@@ -38,6 +38,7 @@ terraform {
 }
 
 inputs = {
+  enabled     = "false"
   name        = "deny_all_create_without_tags"
   description = "Deny all create actions without tags"
   policy_content = {
