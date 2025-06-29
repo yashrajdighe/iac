@@ -18,6 +18,21 @@ include "account" {
   expose = true
 }
 
+dependency "aws_accounts" {
+  config_path = "../../aws_accounts/playground"
+
+  # Configure mock outputs for the `validate` command that are returned when there are no outputs available (e.g the
+  # module hasn't been applied yet.
+  # mock_outputs_allowed_terraform_commands = ["validate"]
+  mock_outputs = {
+    account_id = "123456789012"
+  }
+}
+
+dependencies {
+  paths = ["../../aws_accounts/playground"]
+}
+
 terraform {
   source = "../../../../../../modules/aws/aws_organization_policy"
 }
@@ -58,4 +73,5 @@ inputs = {
       }
     ]
   }
+  policy_attachments = [dependency.aws_accounts.outputs.account_id]
 }

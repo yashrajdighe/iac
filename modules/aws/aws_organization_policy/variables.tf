@@ -20,6 +20,12 @@ variable "policy_content" {
   })
 }
 
+variable "policy_attachments" {
+  description = "A list of AWS Organization IDs to attach the SCP to."
+  type        = list(string)
+  default     = []
+}
+
 variable "tags" {
   description = "A map of tags to assign to the policy."
   type        = map(string)
