@@ -18,3 +18,14 @@ variable "feature_set" {
     error_message = "The feature_set value must be either 'ALL' or 'CONSOLIDATED_BILLING'."
   }
 }
+
+variable "enabled_policy_types" {
+  description = "List of policy types to enable in the organization. Defaults to all available policy types."
+  type        = list(string)
+  default = [
+    "SERVICE_CONTROL_POLICY",
+    # "TAG_POLICY",
+    # "BACKUP_POLICY",
+    # "AISERVICES_OPT_OUT_POLICY",
+  ]
+}
