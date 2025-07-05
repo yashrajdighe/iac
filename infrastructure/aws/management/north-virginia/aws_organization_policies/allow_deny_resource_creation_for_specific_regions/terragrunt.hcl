@@ -38,7 +38,7 @@ terraform {
 }
 
 inputs = {
-  enabled     = "false"
+  enabled     = "true"
   name        = "DenyAllOutsideSelectedRegions"
   description = "Deny creating resources outside selected regions"
   policy_content = {
