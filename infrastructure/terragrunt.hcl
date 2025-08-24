@@ -14,6 +14,7 @@ locals {
 }
 
 generate "provider" {
+  disable   = local.iam_role == "" ? true : false
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
   contents  = <<EOF
