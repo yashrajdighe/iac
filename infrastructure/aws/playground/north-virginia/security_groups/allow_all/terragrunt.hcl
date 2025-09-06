@@ -22,7 +22,7 @@ terraform {
   source = "../../../../../../modules/aws/aws_security_group"
 }
 
-dependency "playground-vpc" {
+dependency "vpc" {
   config_path                             = "../../vpc"
   mock_outputs_allowed_terraform_commands = ["plan"]
 
@@ -41,7 +41,7 @@ inputs = {
   create_security_group = true
   name                  = "allow-all-traffic"
   description           = "This security group allows all inbound traffic."
-  vpc_id                = dependency.playground-vpc.outputs.vpc_id
+  vpc_id                = dependency.vpc.outputs.vpc_id
 
   ingress_rules = [
     {
