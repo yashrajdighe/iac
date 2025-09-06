@@ -24,7 +24,7 @@ terraform {
 
 inputs = {
   # define module inputs here
-  create_ssh_key_pair = false
+  create_ssh_key_pair = true
   key_name            = "playground-default-key"
   public_key          = "ssh-ed25519 AAAAC3NzaC1lZDI1NTE5AAAAIPYPZZvdSj0ey4cursd0GAcUO6IUj62Pgp++DlFskGDq devops@YashrajDighe"
 }
