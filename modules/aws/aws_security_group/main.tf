@@ -11,7 +11,7 @@ resource "aws_security_group" "this" {
 }
 
 resource "aws_vpc_security_group_ingress_rule" "this" {
-  for_each = var.create_security_group ? { for idx, rule in var.ingress_rules : idx => rule } : {}
+  for_each          = var.create_security_group ? { for idx, rule in var.ingress_rules : idx => rule } : {}
   security_group_id = aws_security_group.this[0].id
   cidr_ipv4         = lookup(each.value, "cidr_ipv4", null)
   cidr_ipv6         = lookup(each.value, "cidr_ipv6", null)
@@ -22,7 +22,7 @@ resource "aws_vpc_security_group_ingress_rule" "this" {
 }
 
 resource "aws_vpc_security_group_egress_rule" "this" {
-  for_each = var.create_security_group ? { for idx, rule in var.egress_rules : idx => rule } : {}
+  for_each          = var.create_security_group ? { for idx, rule in var.egress_rules : idx => rule } : {}
   security_group_id = aws_security_group.this[0].id
   cidr_ipv4         = lookup(each.value, "cidr_ipv4", null)
   cidr_ipv6         = lookup(each.value, "cidr_ipv6", null)
