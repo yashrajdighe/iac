@@ -41,7 +41,7 @@ inputs = {
   create_security_group = true
   name                  = "allow-all-traffic"
   description           = "This security group allows all inbound traffic."
-  vpc_id                = dependency.playground-vpc.outputs.vpc_id
+  vpc_id                = dependency.playground-vpc[0].outputs.vpc_id
 
   ingress_rules = [
     {
