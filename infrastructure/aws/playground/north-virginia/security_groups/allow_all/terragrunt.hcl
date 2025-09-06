@@ -23,8 +23,8 @@ terraform {
 }
 
 dependency "playground-vpc" {
-  config_path = "../../vpc"
-  mock_outputs_allowed_terraform_commands  = ["plan"]
+  config_path                             = "../../vpc"
+  mock_outputs_allowed_terraform_commands = ["plan"]
 
   mock_outputs = {
     # define mock outputs here
