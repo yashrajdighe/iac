@@ -23,7 +23,7 @@ terraform {
 }
 
 dependency "vpc" {
-  config_path                             = "../../vpc"
+  config_path = "../../vpc"
   # mock_outputs_allowed_terraform_commands = ["plan"]
 
   mock_outputs = {
