@@ -19,7 +19,8 @@ include "account" {
 }
 
 terraform {
-  source = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git"
+  source = "../../../../../modules/aws/aws_vpc"
+  # source = "git::https://github.com/terraform-aws-modules/terraform-aws-vpc.git"
 }
 
 #dependency "<resource-name>" {
