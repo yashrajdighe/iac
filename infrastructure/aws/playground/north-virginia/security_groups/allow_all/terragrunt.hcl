@@ -22,15 +22,15 @@ terraform {
   source = "../../../../../../modules/aws/aws_security_group"
 }
 
-dependency "vpc" {
-  config_path                             = "../../vpc"
-  mock_outputs_allowed_terraform_commands = ["plan"]
+# dependency "vpc" {
+#   config_path                             = "../../vpc"
+#   mock_outputs_allowed_terraform_commands = ["plan"]
 
-  mock_outputs = {
-    # define mock outputs here
-    id = "vpc-12345678"
-  }
-}
+#   mock_outputs = {
+#     # define mock outputs here
+#     vpc_id = "vpc-12345678"
+#   }
+# }
 
 dependencies {
   paths = ["../../vpc"]
@@ -38,10 +38,10 @@ dependencies {
 
 inputs = {
   # define module inputs here
-  create_security_group = true
+  create_security_group = false
   name                  = "allow-all-traffic"
   description           = "This security group allows all inbound traffic."
-  vpc_id                = dependency.vpc.outputs.id
+  vpc_id                = dependency.vpc.outputs.vpc_id
 
   ingress_rules = [
     {
