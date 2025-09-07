@@ -22,15 +22,15 @@ terraform {
   source = "../../../../../../modules/aws/aws_security_group"
 }
 
-# dependency "vpc" {
-#   config_path                             = "../../vpc"
-#   mock_outputs_allowed_terraform_commands = ["plan"]
+dependency "vpc" {
+  config_path                             = "../../vpc"
+  mock_outputs_allowed_terraform_commands = ["plan"]
 
-#   mock_outputs = {
-#     # define mock outputs here
-#     vpc_id = "vpc-12345678"
-#   }
-# }
+  mock_outputs = {
+    # define mock outputs here
+    vpc_id = "vpc-12345678"
+  }
+}
 
 dependencies {
   paths = ["../../vpc"]
