@@ -40,7 +40,7 @@ dependencies {
 
 inputs = {
   # define module inputs here
-  create_security_group = false
+  create_security_group = true
   name                  = "allow-all-traffic"
   description           = "This security group allows all inbound traffic."
   vpc_id                = dependency.vpc.outputs.vpc_id
