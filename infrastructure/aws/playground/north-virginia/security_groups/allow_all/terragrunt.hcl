@@ -28,7 +28,7 @@ dependency "vpc" {
 
   mock_outputs = {
     # define mock outputs here
-    vpc_id = "vpc-12345678"
+    id = "vpc-12345678"
   }
 }
 
@@ -41,7 +41,7 @@ inputs = {
   create_security_group = true
   name                  = "allow-all-traffic"
   description           = "This security group allows all inbound traffic."
-  vpc_id                = dependency.vpc.outputs.vpc_id
+  vpc_id                = dependency.vpc.outputs.id
 
   ingress_rules = [
     {
