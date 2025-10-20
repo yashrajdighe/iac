@@ -24,5 +24,5 @@ terraform {
 
 inputs = {
   account_name  = "common"
-  account_email = "yashraj.dighe077+aws-common@gmail.com"
+  account_email = "yashraj.dighe077+aws-common-account@gmail.com"
 }
