@@ -40,5 +40,5 @@ terraform {
 
 inputs = {
   create_s3_bucket = true
-  name             = "git-backup-bucket"
+  name             = "common-yashrajdighe-git-repo-backup"
 }
