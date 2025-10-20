@@ -1,4 +1,3 @@
-
 resource "aws_security_group" "this" {
   count       = var.create_security_group ? 1 : 0
   name        = var.name
@@ -15,9 +14,9 @@ resource "aws_vpc_security_group_ingress_rule" "this" {
   security_group_id = aws_security_group.this[0].id
   cidr_ipv4         = lookup(each.value, "cidr_ipv4", null)
   cidr_ipv6         = lookup(each.value, "cidr_ipv6", null)
-  from_port         = each.value.from_port
+  from_port         = each.value.ip_protocol != "-1" ? each.value.from_port : null
   ip_protocol       = each.value.ip_protocol
-  to_port           = each.value.to_port
+  to_port           = each.value.ip_protocol != "-1" ? each.value.to_port : null
   description       = lookup(each.value, "description", null)
 }
 
@@ -26,8 +25,8 @@ resource "aws_vpc_security_group_egress_rule" "this" {
   security_group_id = aws_security_group.this[0].id
   cidr_ipv4         = lookup(each.value, "cidr_ipv4", null)
   cidr_ipv6         = lookup(each.value, "cidr_ipv6", null)
-  from_port         = lookup(each.value, "from_port", null)
-  to_port           = lookup(each.value, "to_port", null)
+  from_port         = each.value.ip_protocol != "-1" ? lookup(each.value, "from_port", null) : null
+  to_port           = each.value.ip_protocol != "-1" ? lookup(each.value, "to_port", null) : null
   ip_protocol       = each.value.ip_protocol
   description       = lookup(each.value, "description", null)
 }
