@@ -19,7 +19,8 @@ include "account" {
 }
 
 terraform {
-  source = "terraform-aws-modules/iam/aws//modules/iam-role"
+  source = "git::https://github.com/terraform-aws-modules/terraform-aws-iam.git/modules/iam-role"
+  # source = "terraform-aws-modules/iam/aws//modules/iam-role"
 }
 
 dependency "policy" {
