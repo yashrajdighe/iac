@@ -58,7 +58,7 @@ inputs = {
         },
         {
           "Action": [
-            "s3:ListBucket",
+            "s3:ListBucket"
           ],
           "Effect": "Allow",
           "Resource": "arn:aws:s3:::common-yashrajdighe-git-repo-backup"
