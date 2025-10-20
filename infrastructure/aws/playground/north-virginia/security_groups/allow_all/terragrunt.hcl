@@ -57,8 +57,6 @@ inputs = {
   egress_rules = [
     {
       cidr_ipv4   = "0.0.0.0/0"
-      from_port   = 0
-      to_port     = 0
       ip_protocol = "-1"
       description = "Allow all outbound traffic to anywhere"
     }
