@@ -41,6 +41,7 @@ dependencies {
 #}
 
 inputs = {
+  name               = "common-yashrajdighe-git-repo-backup"
   enable_github_oidc = true
   oidc_wildcard_subjects = [
     "repo:yashrajdighe/backup-git-repos:*" # should be updated later
