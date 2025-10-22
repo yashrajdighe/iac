@@ -1,3 +1,3 @@
 locals {
-  aws_modules_root = "abspath(${get_terragrunt_dir()}/../modules/aws)"
+  aws_modules_root = "${find_in_parent_folders("modules/aws")}"
 }
