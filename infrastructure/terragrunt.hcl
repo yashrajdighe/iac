@@ -11,6 +11,8 @@ locals {
   project       = "iac" # optional
   creator       = "tofu/terragrunt"
   team          = "devops"
+
+  aws_modules_root = "${find_in_parent_folders("modules_path.hcl")}"
 }
 
 generate "provider" {
