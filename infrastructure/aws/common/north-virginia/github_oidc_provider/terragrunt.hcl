@@ -19,7 +19,7 @@ include "account" {
 }
 
 include "common_inputs" {
-  path   = find_in_parent_folders("_env/github_oidc_provider.hcl")
+  path = find_in_parent_folders("_env/github_oidc_provider.hcl")
 }
 
 #dependency "<resource-name>" {
