@@ -18,8 +18,8 @@ include "account" {
   expose = true
 }
 
-terraform {
-  source = "../../../../../modules/aws/aws_iam_openid_connect_github_provider"
+include "common_inputs" {
+  path = find_in_parent_folders("_env/github_oidc_provider.hcl")
 }
 
 #dependency "<resource-name>" {
@@ -37,7 +37,3 @@ terraform {
 #locals {
 # define locals here
 #}
-
-inputs = {
-  create_github_oidc_provider = true
-}
