@@ -1,5 +1,5 @@
 terraform {
-  source = "${local.aws_modules_root}/aws_iam_openid_connect_github_provider"
+  source = "${include.roots.locals.aws_modules_root}/aws_iam_openid_connect_github_provider"
 }
 
 inputs = {
