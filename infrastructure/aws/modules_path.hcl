@@ -1,3 +1,3 @@
 locals {
-  aws_modules_root = "${dirname(find_in_parent_folders("terragrunt.hcl"))}/../modules/aws"
+  aws_modules_root = "${get_terragrunt_dir()}/../modules/aws"
 }
