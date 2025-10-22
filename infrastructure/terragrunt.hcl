@@ -12,7 +12,7 @@ locals {
   creator       = "tofu/terragrunt"
   team          = "devops"
 
-  aws_modules_root = "${find_in_parent_folders("modules_path.hcl")}"
+  aws_modules_root = read_terragrunt_config(find_in_parent_folders("modules_path.hcl")).locals.aws_modules_root
 }
 
 generate "provider" {
