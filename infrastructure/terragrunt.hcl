@@ -11,7 +11,7 @@ locals {
   project          = "iac" # optional
   creator          = "tofu/terragrunt"
   team             = "devops"
-  current_hcl_path = get_terragrunt_dir()
+  current_hcl_path = get_repo_root() #get_terragrunt_dir()
 }
 
 generate "provider" {
