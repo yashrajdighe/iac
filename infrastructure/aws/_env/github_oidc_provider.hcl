@@ -3,5 +3,5 @@ terraform {
 }
 
 inputs = {
-  create_github_oidc_provider = true
+  create_github_oidc_provider = false
 }
