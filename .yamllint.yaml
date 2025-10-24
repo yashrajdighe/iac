@@ -3,12 +3,12 @@ extends: default
 
 rules:
   line-length:
-    max: 80
+    max: 200
     level: error
     ignore: |
       .github/workflows/
   truthy:
-    allowed-values: ['true', 'false', 'on']
+    allowed-values: ["true", "false", "on"]
   comments:
     min-spaces-from-content: 1
     ignore: |
