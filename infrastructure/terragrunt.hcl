@@ -11,7 +11,7 @@ locals {
   project          = "iac" # optional
   creator          = "tofu/terragrunt"
   team             = "devops"
-  current_hcl_path = abspath(get_terragrunt_dir())
+  current_hcl_path = dirname(find_in_parent_folders("terragrunt.hcl")) #abspath(get_terragrunt_dir())
 }
 
 generate "provider" {
