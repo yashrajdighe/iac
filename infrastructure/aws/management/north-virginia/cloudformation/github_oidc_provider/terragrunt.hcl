@@ -43,6 +43,8 @@ terraform {
 #}
 
 inputs = {
-  name         = "GitHub-OIDC-Provider"
-  template_url = "https://my-initial-cf-stack-templates.s3.us-east-1.amazonaws.com/identity-provider-github.json"
+  name                    = "GitHub-OIDC-Provider"
+  template_url            = "https://my-initial-cf-stack-templates.s3.us-east-1.amazonaws.com/identity-provider-github.json"
+  organizational_unit_ids = ["r-kfvz"]
+  regions                 = ["us-east-1"]
 }
