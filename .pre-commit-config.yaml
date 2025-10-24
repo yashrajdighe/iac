@@ -1,10 +1,13 @@
 ---
 repos:
-  - repo: https://github.com/antonbabenko/pre-commit-terraform
-    rev: v1.83.5
+  - repo: local
     hooks:
-      - id: terraform_fmt
-      - id: terragrunt_fmt
+      - id: tofu-hclfmt
+        name: tofu hclfmt
+        description: Format opentofu/terraform HCL files with 'tofu fmt -recursive'
+        entry: tofu fmt -recursive
+        language: system
+        files: \.tf$
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.5.0
