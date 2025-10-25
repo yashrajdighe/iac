@@ -6,6 +6,8 @@ resource "aws_cloudformation_stack_set" "this" {
     enabled                          = true
     retain_stacks_on_account_removal = false
   }
+
+  administration_role_arn = "arn:aws:iam::183631350996:role/aws-service-role/stacksets.cloudformation.amazonaws.com/AWSServiceRoleForCloudFormationStackSetsOrgAdmin" # managed by AWS
 }
 
 resource "aws_cloudformation_stack_instances" "this" {
