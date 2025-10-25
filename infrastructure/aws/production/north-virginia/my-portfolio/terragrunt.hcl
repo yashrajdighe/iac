@@ -18,8 +18,8 @@ include "account" {
   expose = true
 }
 
-terraform {
-  source = "../../../../../modules/aws/static_web_deployment"
+include "common_inputs" {
+  path = find_in_parent_folders("_env/my_portfolio.hcl")
 }
 
 #dependency "<resource-name>" {
@@ -39,21 +39,5 @@ terraform {
 #}
 
 inputs = {
-  create_static_web_deployment   = true
-  static_web_deployment_name     = "my-portfolio-app-${include.env.locals.env}"
-  enable_cloudfront_distribution = true
-
-  origins = [
-    {
-      path          = "/"
-      origin_id     = "root"
-      bucket_suffix = "root"
-    }
-  ]
-
-  default_cache_behavior = {
-    target_origin_id = "root"
-  }
-
-  default_root_object = "index.html"
+  static_web_deployment_name = "my-portfolio-app-${include.env.locals.env}"
 }
