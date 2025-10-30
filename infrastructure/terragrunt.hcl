@@ -1,16 +1,17 @@
 locals {
-  account_vars  = read_terragrunt_config(find_in_parent_folders("account.hcl"))
-  region_vars   = read_terragrunt_config(find_in_parent_folders("region.hcl"))
-  env_vars      = read_terragrunt_config(find_in_parent_folders("env.hcl"))
-  iam_role      = local.account_vars.locals.iam_role
-  bucket_region = "us-east-1" # always be in north virginia for state bucket
-  aws_region    = local.region_vars.locals.aws_region
-  account_name  = local.account_vars.locals.account_name
-  env           = local.env_vars.locals.env
-  platform      = "aws" # optional
-  project       = "iac" # optional
-  creator       = "tofu/terragrunt"
-  team          = "devops"
+  account_vars     = read_terragrunt_config(find_in_parent_folders("account.hcl"))
+  region_vars      = read_terragrunt_config(find_in_parent_folders("region.hcl"))
+  env_vars         = read_terragrunt_config(find_in_parent_folders("env.hcl"))
+  iam_role         = local.account_vars.locals.iam_role
+  bucket_region    = "us-east-1" # always be in north virginia for state bucket
+  aws_region       = local.region_vars.locals.aws_region
+  account_name     = local.account_vars.locals.account_name
+  env              = local.env_vars.locals.env
+  platform         = "aws" # optional
+  project          = "iac" # optional
+  creator          = "tofu/terragrunt"
+  team             = "devops"
+  current_hcl_path = abspath("${get_terragrunt_dir()}/${dirname(find_in_parent_folders("terragrunt.hcl"))}") #abspath(get_terragrunt_dir())
 }
 
 generate "provider" {
@@ -27,6 +28,7 @@ generate "provider" {
                     creator = "${local.creator}"
                     team = "${local.team}"
                     environment = "${local.env}"
+                    tg_path = "${local.current_hcl_path}"
                 }
             }
             assume_role {
