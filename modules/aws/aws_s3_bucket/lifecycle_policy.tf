@@ -1,4 +1,4 @@
-resource "aws_s3_bucket_lifecycle_configuration" "retention_policy" {
+resource "aws_s3_bucket_lifecycle_configuration" "lifecycle_policy" {
   # create lifecycle configuration only if the bucket itself is being created
   count  = var.create_s3_bucket ? 1 : 0
   bucket = aws_s3_bucket.this[0].id
