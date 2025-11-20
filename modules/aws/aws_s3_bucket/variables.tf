@@ -27,3 +27,9 @@ variable "retention_days" {
   type        = number
   default     = 7
 }
+
+variable "failed_multipart_upload_cleanup" {
+  description = "Enable cleanup of failed multipart upload from S3"
+  type        = bool
+  default     = false
+}
