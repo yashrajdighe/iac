@@ -15,3 +15,15 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "enable_retention" {
+  description = "enable retention on this bucket"
+  type        = bool
+  default     = false
+}
+
+variable "retention_days" {
+  description = "Number of days to retain the data inside the bucket."
+  type        = number
+  default     = 7
+}
