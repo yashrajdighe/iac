@@ -3,6 +3,6 @@ terraform {
 }
 
 inputs = {
-  limit_amount               = "500"
+  limit_amount               = "5"
   subscriber_email_addresses = ["yashraj.dighe077+aws-budgets-notification-staging@gmail.com"]
 }
