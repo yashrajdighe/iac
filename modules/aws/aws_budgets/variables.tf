@@ -17,7 +17,7 @@ variable "limit_amount" {
 variable "limit_unit" {
   description = "The unit of the budget amount."
   type        = string
-  default     = "INR"
+  default     = "USD"
 }
 
 variable "time_unit" {
