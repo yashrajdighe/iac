@@ -39,5 +39,6 @@ include "common_inputs" {
 #}
 
 inputs = {
+  name                       = "development-account-monthly-budget"
   subscriber_email_addresses = ["yashraj.dighe077+aws-budgets-notification-development@gmail.com"]
 }
