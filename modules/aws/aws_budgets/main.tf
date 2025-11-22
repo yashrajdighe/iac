@@ -1,5 +1,5 @@
 resource "aws_budgets_budget" "this" {
-  name              = "budget-ec2-monthly"
+  name              = var.name
   budget_type       = "COST"
   limit_amount      = var.limit_amount
   limit_unit        = var.limit_unit

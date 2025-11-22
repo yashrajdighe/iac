@@ -4,6 +4,11 @@ variable "enable_budgets" {
   default     = true
 }
 
+variable "name" {
+  description = "The name of the budget."
+  type        = string
+}
+
 variable "limit_amount" {
   description = "The total amount of cost to budget."
   type        = string
