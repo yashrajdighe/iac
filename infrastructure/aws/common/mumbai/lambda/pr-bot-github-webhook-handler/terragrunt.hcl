@@ -42,7 +42,7 @@ inputs = {
   function_name = "prBotGithubWebhookHandler"
   handler       = "index.handler"
   runtime       = "python3.14"
-  source_path   = "./notifier.py"
+  source_path   = "./code"
   tags = {
     app_name = "GreenLight"
   }
