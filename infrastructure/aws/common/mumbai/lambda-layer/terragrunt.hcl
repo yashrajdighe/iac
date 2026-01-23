@@ -19,7 +19,7 @@ include "account" {
 }
 
 terraform {
-  source = "../../../../../../modules/aws/aws_lambda_layer"
+  source = "../../../../../modules/aws/aws_lambda_layer"
 }
 
 #dependency "<resource-name>" {
