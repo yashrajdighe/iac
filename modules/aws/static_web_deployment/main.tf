@@ -83,3 +83,13 @@ resource "aws_cloudfront_origin_access_control" "this" {
   signing_behavior                  = "always"
   signing_protocol                  = "sigv4"
 }
+
+resource "aws_iam_role" "github_actions_role" {
+  name               = "github-actions-s3-role"
+  assume_role_policy = data.aws_iam_policy_document.github_oidc_assume_role.json
+
+  inline_policy {
+    name   = "s3-access-policy"
+    policy = data.aws_iam_policy_document.s3_permissions.json
+  }
+}

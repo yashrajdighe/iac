@@ -40,4 +40,6 @@ include "common_inputs" {
 
 inputs = {
   static_web_deployment_name = "my-portfolio-app-${include.env.locals.env}"
+  github_repo_name           = "my-portfolio"
+  environment_name           = "${include.env.locals.env}"
 }

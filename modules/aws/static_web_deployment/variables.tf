@@ -53,3 +53,19 @@ variable "tags" {
   type        = map(string)
   default     = {}
 }
+
+variable "github_org_name" {
+  description = "Github org name"
+  type        = string
+  default     = "yashrajdighe"
+}
+
+variable "github_repo_name" {
+  description = "Github repo name"
+  type        = string
+}
+
+variable "environment_name" {
+  description = "Environment name"
+  type        = string
+}
