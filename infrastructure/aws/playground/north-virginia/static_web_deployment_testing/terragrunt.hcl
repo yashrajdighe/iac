@@ -63,4 +63,6 @@ inputs = {
   ]
 
   default_root_object = "index.html"
+  github_repo_name    = "my-portfolio"
+  environment_name    = "${include.env.locals.env}"
 }
