@@ -85,7 +85,7 @@ resource "aws_cloudfront_origin_access_control" "this" {
 }
 
 resource "aws_iam_role" "github_actions_role" {
-  name               = "github-actions-s3-role"
+  name               = "${var.static_web_deployment_name}-deployment-role"
   assume_role_policy = data.aws_iam_policy_document.github_oidc_assume_role.json
 
   inline_policy {
