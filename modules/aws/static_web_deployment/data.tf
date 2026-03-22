@@ -60,6 +60,6 @@ data "aws_iam_policy_document" "secrets_manager_permissions" {
       "secretsmanager:GetSecretValue",
       "secretsmanager:DescribeSecret"
     ]
-    resources = ["arn:aws:secretsmanager:ap-south-1:530354880605:secret:/common/github/yd-devops-hub/global/CLOUDFLARE_API_TOKEN-VjcxZF"]
+    resources = [var.cloudflare_api_token_secret_arn]
   }
 }

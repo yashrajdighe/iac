@@ -69,3 +69,9 @@ variable "environment_name" {
   description = "Environment name"
   type        = string
 }
+
+variable "cloudflare_api_token_secret_arn" {
+  description = "Cloudflare API token secret arn"
+  type        = string
+  default     = ""
+}
