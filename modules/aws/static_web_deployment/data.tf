@@ -52,3 +52,14 @@ data "aws_iam_policy_document" "s3_permissions" {
     resources = local.bucket_arns
   }
 }
+
+data "aws_iam_policy_document" "secrets_manager_permissions" {
+  statement {
+    effect = "Allow"
+    actions = [
+      "secretsmanager:GetSecretValue",
+      "secretsmanager:DescribeSecret"
+    ]
+    resources = ["arn:aws:secretsmanager:ap-south-1:530354880605:secret:/common/github/yd-devops-hub/global/CLOUDFLARE_API_TOKEN-VjcxZF"]
+  }
+}

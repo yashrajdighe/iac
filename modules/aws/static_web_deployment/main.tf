@@ -92,4 +92,8 @@ resource "aws_iam_role" "github_actions_role" {
     name   = "s3-access-policy"
     policy = data.aws_iam_policy_document.s3_permissions.json
   }
+  inline_policy {
+    name   = "secrets-manager-access-policy"
+    policy = data.aws_iam_policy_document.secrets_manager_permissions.json
+  }
 }
