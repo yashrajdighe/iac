@@ -17,7 +17,6 @@ concurrency:
 
 env:
   GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-  CLOUDFLARE_API_TOKEN: ${{ secrets.CLOUDFLARE_API_TOKEN }}
 
 permissions:
   id-token: write # This is required for requesting the JWT
@@ -34,4 +33,5 @@ jobs:
       tofu_version: "1.8.1"
       tg_version: "0.67.0"
       github_environment: "terraform"
+      cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     secrets: inherit
