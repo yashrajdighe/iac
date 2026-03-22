@@ -71,7 +71,7 @@ remote_state {
     {
       encrypt        = true
       bucket         = "${local.state_account_name}-${local.platform}-${local.project}-tf-states"
-      key            = "${path_relative_to_include()}/terraform.tfstate"
+      key            = "${trimprefix(path_relative_to_include(), "infrastructure/")}/terraform.tfstate"
       region         = local.bucket_region
       dynamodb_table = "${local.state_account_name}-${local.platform}-${local.project}-tf-locks"
     },
