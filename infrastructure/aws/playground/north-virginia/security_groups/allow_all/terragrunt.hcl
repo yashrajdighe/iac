@@ -26,7 +26,7 @@ dependency "vpc" {
   config_path                             = "../../vpc"
   mock_outputs_allowed_terraform_commands = ["plan", "validate"]
 
-  mock_outputs_merge_strategy_with_state = "deep_map_only"
+  mock_outputs_merge_strategy_with_state = "no_merge"
 
   mock_outputs = {
     # define mock outputs here
