@@ -1,9 +1,8 @@
 locals {
-  platform_vars       = read_terragrunt_config(find_in_parent_folders("platform.hcl"))
-  account_vars        = read_terragrunt_config(find_in_parent_folders("account.hcl"))
-  region_vars         = try(read_terragrunt_config(find_in_parent_folders("region.hcl")), { locals = { aws_region = "" } })
-  env_vars            = try(read_terragrunt_config(find_in_parent_folders("env.hcl")), { locals = { env = "" } })
-  common_account_vars = read_terragrunt_config("${get_repo_root()}/infrastructure/aws/common/account.hcl")
+  platform_vars = read_terragrunt_config(find_in_parent_folders("platform.hcl"))
+  account_vars  = read_terragrunt_config(find_in_parent_folders("account.hcl"))
+  region_vars   = try(read_terragrunt_config(find_in_parent_folders("region.hcl")), { locals = { aws_region = "" } })
+  env_vars      = try(read_terragrunt_config(find_in_parent_folders("env.hcl")), { locals = { env = "" } })
 
   platform     = local.platform_vars.locals.platform
   account_name = local.account_vars.locals.account_name
@@ -11,9 +10,13 @@ locals {
   aws_region   = local.region_vars.locals.aws_region
   env          = local.env_vars.locals.env
 
+  # Common AWS account — state backend for all non-AWS platforms.
+  common_account_name   = "common"
+  common_state_role_arn = "arn:aws:iam::530354880605:role/OrganizationAccountAccessRole"
+
   # For non-AWS platforms, state is stored in the common AWS account.
-  state_account_name = local.platform == "aws" ? local.account_name : local.common_account_vars.locals.account_name
-  state_role_arn     = local.platform == "aws" ? local.iam_role : local.common_account_vars.locals.iam_role
+  state_account_name = local.platform == "aws" ? local.account_name : local.common_account_name
+  state_role_arn     = local.platform == "aws" ? local.iam_role : local.common_state_role_arn
 
   bucket_region = "us-east-1" # always be in north virginia for state bucket
   project       = "iac"
