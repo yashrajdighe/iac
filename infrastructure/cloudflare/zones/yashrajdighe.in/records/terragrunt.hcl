@@ -18,7 +18,7 @@ include "account" {
 # }
 
 terraform {
-  source = "../../../../modules/cloudflare/cloudflare_records"
+  source = "../../../../../modules/cloudflare/cloudflare_records"
 }
 
 #dependency "<resource-name>" {
