@@ -40,6 +40,6 @@ terraform {
 
 inputs = {
   description          = "AWS CMK for managing secrets"
-  alias_name           = "${include.env.locals.env}-secrets-manager-cmk"
+  alias_name           = "alias/${include.env.locals.env}-secrets-manager-cmk"
   allowed_use_role_arn = ["arn:aws:iam::006763131804:role/my-portfolio-app-development-deployment-role", " arn:aws:iam::063903862285:role/my-portfolio-app-staging-deployment-role", "arn:aws:iam::403245569160:role/my-portfolio-app-production-deployment-role"]
 }
