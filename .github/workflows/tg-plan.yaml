@@ -32,5 +32,4 @@ jobs:
       working_directory: "terragrunt/infrastructure"
       tofu_version: "1.8.1"
       tg_version: "0.67.0"
-      cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     secrets: inherit

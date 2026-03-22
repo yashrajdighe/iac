@@ -43,5 +43,4 @@ jobs:
       resource_name: ${{ inputs.resource_name }}
       resource_id: ${{ inputs.resource_id }}
       enable_oidc_debugger: ${{ inputs.enable_oidc_debugger }}
-      cloudflare_api_token: ${{ secrets.CLOUDFLARE_API_TOKEN }}
     secrets: inherit
