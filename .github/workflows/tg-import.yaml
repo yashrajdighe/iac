@@ -1,24 +1,24 @@
 ---
-name: 'Terragrunt Import Resources'
+name: "Terragrunt Import Resources"
 
 on:
   workflow_dispatch:
     inputs:
       working_directory:
-        description: 'Working directory for terragrunt'
+        description: "Working directory for terragrunt"
         required: true
         type: string
-        default: 'infrastructure/aws'
+        default: "terragrunt/infrastructure"
       resource_name:
-        description: 'Name of the resource to import'
+        description: "Name of the resource to import"
         required: true
         type: string
       resource_id:
-        description: 'ID of the resource to import'
+        description: "ID of the resource to import"
         required: true
         type: string
       enable_oidc_debugger:
-        description: 'Enable OIDC Debugger'
+        description: "Enable OIDC Debugger"
         required: false
         type: boolean
         default: false
