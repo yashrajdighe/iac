@@ -23,15 +23,15 @@ include "common_inputs" {
 }
 
 dependency "kms_cmk" {
-  config_path = "../../common/mumbai/kms_cmk/secrets_manager/terragrunt.hcl"
+  config_path = "../../../common/mumbai/kms_cmk/secrets_manager/terragrunt.hcl"
 
   mock_outputs = {
-    kms_cmk_arn = "arn:aws:kms:us-east-1:006763131804:key/1234567890"
+    kms_key_arn = "arn:aws:kms:us-east-1:006763131804:key/1234567890"
   }
 }
 
 dependencies {
-  paths = ["../../common/mumbai/kms_cmk/secrets_manager"]
+  paths = ["../../../common/mumbai/kms_cmk/secrets_manager"]
 }
 
 #locals {
@@ -42,5 +42,5 @@ inputs = {
   static_web_deployment_name = "my-portfolio-app-${include.env.locals.env}"
   github_repo_name           = "my-portfolio"
   environment_name           = "${include.env.locals.env}"
-  kms_key_arn                = dependency.kms_cmk.outputs.kms_cmk_arn
+  kms_key_arn                = dependency.kms_cmk.outputs.kms_key_arn
 }
