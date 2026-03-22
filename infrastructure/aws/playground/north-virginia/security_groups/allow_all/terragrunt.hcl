@@ -34,10 +34,6 @@ dependency "vpc" {
   }
 }
 
-dependencies {
-  paths = ["../../vpc"]
-}
-
 inputs = {
   # define module inputs here
   create_security_group = false
