@@ -75,3 +75,9 @@ variable "cloudflare_api_token_secret_arn" {
   type        = string
   default     = ""
 }
+
+variable "kms_key_arn" {
+  description = "Cross-account KMS key ARN for decrypt access"
+  type        = string
+  default     = ""
+}

@@ -99,4 +99,11 @@ resource "aws_iam_role" "github_actions_role" {
       policy = data.aws_iam_policy_document.secrets_manager_permissions.json
     }
   }
+  dynamic "inline_policy" {
+    for_each = var.kms_key_arn != "" ? [1] : []
+    content {
+      name   = "cross-account-kms-access-policy"
+      policy = data.aws_iam_policy_document.cross_account_kms_permissions[0].json
+    }
+  }
 }

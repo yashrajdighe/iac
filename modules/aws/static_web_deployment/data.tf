@@ -63,3 +63,17 @@ data "aws_iam_policy_document" "secrets_manager_permissions" {
     resources = [var.cloudflare_api_token_secret_arn]
   }
 }
+
+data "aws_iam_policy_document" "cross_account_kms_permissions" {
+  count = var.kms_key_arn != "" ? 1 : 0
+
+  statement {
+    sid    = "AllowUseOfCrossAccountKMSKey"
+    effect = "Allow"
+    actions = [
+      "kms:Decrypt",
+      "kms:DescribeKey",
+    ]
+    resources = [var.kms_key_arn]
+  }
+}
