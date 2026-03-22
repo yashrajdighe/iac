@@ -10,5 +10,5 @@ output "record_ids" {
 
 output "record_hostnames" {
   description = "Map of fully-qualified DNS record hostnames keyed by the input map key"
-  value       = { for k, v in cloudflare_dns_record.this : k => v.hostname }
+  value       = { for k, v in cloudflare_dns_record.this : k => v.name }
 }
