@@ -23,11 +23,9 @@ locals {
   bucket_region      = "us-east-1" # always north virginia for state buckets
 
   # ── GCS state (GCP) ──────────────────────────────────────────────────────
-  gcp_wif_provider          = "projects/850812025847/locations/global/workloadIdentityPools/yashrajdighe-iac-readonly/providers/read-access"
-  gcp_service_account       = "yashrajdighe-iac-readonly@project-c0cea0c3-cf00-4dc8-b6d.iam.gserviceaccount.com"
-  gcp_management_project_id = "project-c0cea0c3-cf00-4dc8-b6d"
-  gcp_state_bucket          = "management-gcp-iac-tf-states"
-  gcp_state_location        = "US"
+  gcp_wif_provider    = "projects/850812025847/locations/global/workloadIdentityPools/yashrajdighe-iac-readonly/providers/read-access"
+  gcp_service_account = "yashrajdighe-iac-readonly@project-c0cea0c3-cf00-4dc8-b6d.iam.gserviceaccount.com"
+  gcp_state_bucket    = "management-gcp-iac-tf-states"
 }
 
 # ── AWS ──────────────────────────────────────────────────────────────────────
@@ -140,7 +138,6 @@ generate "gcp_backend" {
   contents  = <<EOF
 terraform {
   backend "gcs" {
-    project                     = "${local.gcp_management_project_id}"
     bucket                      = "${local.gcp_state_bucket}"
     prefix                      = "${trimprefix(path_relative_to_include(), "infrastructure/gcp/")}"
     impersonate_service_account = "${local.gcp_service_account}"
