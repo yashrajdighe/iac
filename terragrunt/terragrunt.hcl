@@ -3,6 +3,8 @@ locals {
   account_vars  = try(read_terragrunt_config(find_in_parent_folders("account.hcl")), { locals = { account_name = "", iam_role = "" } })
   region_vars   = try(read_terragrunt_config(find_in_parent_folders("region.hcl")), { locals = { aws_region = "" } })
   env_vars      = try(read_terragrunt_config(find_in_parent_folders("env.hcl")), { locals = { env = "" } })
+  # Per-org GCP service account — mirrors account.hcl → iam_role for AWS.
+  gcp_org_vars = try(read_terragrunt_config(find_in_parent_folders("org.hcl")), { locals = { service_account = "" } })
 
   platform     = local.platform_vars.locals.platform
   account_name = local.account_vars.locals.account_name
@@ -23,9 +25,12 @@ locals {
   bucket_region      = "us-east-1" # always north virginia for state buckets
 
   # ── GCS state (GCP) ──────────────────────────────────────────────────────
-  gcp_wif_provider    = "projects/850812025847/locations/global/workloadIdentityPools/yashrajdighe-iac-readonly/providers/read-access"
-  gcp_service_account = "yashrajdighe-iac-readonly@project-c0cea0c3-cf00-4dc8-b6d.iam.gserviceaccount.com"
-  gcp_state_bucket    = "management-gcp-iac-tf-states"
+  # CI/CD base identity — used by the GCS backend (level 1, set by the WIF auth step).
+  gcp_wif_provider = "projects/850812025847/locations/global/workloadIdentityPools/yashrajdighe-iac-readonly/providers/read-access"
+  gcp_ci_sa        = "yashrajdighe-iac-readonly@project-c0cea0c3-cf00-4dc8-b6d.iam.gserviceaccount.com"
+  gcp_state_bucket = "management-gcp-iac-tf-states"
+  # Per-org provider identity — impersonated by the provider (level 2, mirrors iam_role per AWS account).
+  gcp_provider_sa = local.gcp_org_vars.locals.service_account
 }
 
 # ── AWS ──────────────────────────────────────────────────────────────────────
@@ -126,7 +131,7 @@ terraform {
 }
 
 provider "google" {
-  impersonate_service_account = "${local.gcp_service_account}"
+  impersonate_service_account = "${local.gcp_provider_sa}"
 }
 EOF
 }
@@ -138,9 +143,8 @@ generate "gcp_backend" {
   contents  = <<EOF
 terraform {
   backend "gcs" {
-    bucket                      = "${local.gcp_state_bucket}"
-    prefix                      = "${trimprefix(path_relative_to_include(), "infrastructure/gcp/")}"
-    impersonate_service_account = "${local.gcp_service_account}"
+    bucket = "${local.gcp_state_bucket}"
+    prefix = "${trimprefix(path_relative_to_include(), "infrastructure/gcp/")}"
   }
 }
 EOF

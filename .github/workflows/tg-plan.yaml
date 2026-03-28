@@ -29,6 +29,8 @@ jobs:
     with:
       enable_oidc_debugger: false
       role_to_assume: ${{ vars.TERRAFORM_IAM_ROLE }}
+      workload_identity_provider: ${{ vars.GCP_WIF_PROVIDER }}
+      service_account: ${{ vars.GCP_SERVICE_ACCOUNT }}
       working_directory: "terragrunt/infrastructure"
       tofu_version: "1.8.1"
       tg_version: "0.67.0"
