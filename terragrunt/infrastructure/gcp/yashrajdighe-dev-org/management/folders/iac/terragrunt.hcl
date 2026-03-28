@@ -5,11 +5,12 @@ include "root" {
 locals {
   org_vars = read_terragrunt_config(find_in_parent_folders("org.hcl"))
 
-  org_id = local.org_vars.locals.org_id
+  org_id   = local.org_vars.locals.org_id
+  root_dir = dirname(find_in_parent_folders())
 }
 
 terraform {
-  source = "${get_repo_root()}/modules/gcp/gcp_folder"
+  source = "${local.root_dir}/../modules/gcp/gcp_folder"
 }
 
 inputs = {
