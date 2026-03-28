@@ -67,9 +67,7 @@ terraform {
     key            = "${trimprefix(path_relative_to_include(), "infrastructure/")}/terraform.tfstate"
     region         = "${local.bucket_region}"
     dynamodb_table = "${local.state_account_name}-${local.platform}-${local.project}-tf-locks"
-    assume_role {
-      role_arn = "${local.state_role_arn}"
-    }
+    assume_role    = { role_arn = "${local.state_role_arn}" }
   }
 }
 EOF
@@ -107,9 +105,7 @@ terraform {
     key            = "${trimprefix(path_relative_to_include(), "infrastructure/")}/terraform.tfstate"
     region         = "${local.bucket_region}"
     dynamodb_table = "${local.state_account_name}-${local.platform}-${local.project}-tf-locks"
-    assume_role {
-      role_arn = "${local.state_role_arn}"
-    }
+    assume_role    = { role_arn = "${local.state_role_arn}" }
   }
 }
 EOF
