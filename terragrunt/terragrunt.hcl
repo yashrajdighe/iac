@@ -30,129 +30,95 @@ locals {
   # CI/CD base identity — used by the GCS backend (level 1, set by the WIF auth step).
   gcp_wif_provider = "projects/850812025847/locations/global/workloadIdentityPools/yashrajdighe-iac-readonly/providers/read-access"
   gcp_ci_sa        = "yashrajdighe-iac-readonly@project-c0cea0c3-cf00-4dc8-b6d.iam.gserviceaccount.com"
-  # State project resolution (mirrors state_account_name for AWS):
-  #   1. Use project_name from the closest project.hcl (resources scoped to a GCP project).
-  #   2. Fall back to org.hcl → state_project_name for org-level resources (e.g. folders)
-  #      that have no project.hcl in their path.
+  # Per-project bucket — use project.hcl → project_name; fall back to org.hcl → state_project_name
+  # for org-level resources (e.g. folders) that have no project.hcl in their path.
   gcp_state_project = local.gcp_project_vars.locals.project_name != "" ? local.gcp_project_vars.locals.project_name : local.gcp_org_vars.locals.state_project_name
   gcp_state_bucket  = "${local.gcp_state_project}-gcp-${local.project}-tf-states"
   # Per-org provider identity — impersonated by the provider (level 2, mirrors iam_role per AWS account).
   gcp_provider_sa = local.gcp_org_vars.locals.service_account
+
+  # ── Provider contents (one per platform) ─────────────────────────────────
+  aws_provider_contents = <<-EOF
+    provider "aws" {
+      region = "${local.aws_region}"
+      default_tags {
+        tags = {
+          platform    = "${local.platform}"
+          project     = "${local.project}"
+          creator     = "${local.creator}"
+          team        = "${local.team}"
+          environment = "${local.env}"
+        }
+      }
+      assume_role {
+        role_arn = "${local.iam_role}"
+      }
+    }
+  EOF
+
+  cloudflare_provider_contents = <<-EOF
+    terraform {
+      required_providers {
+        cloudflare = {
+          source  = "cloudflare/cloudflare"
+          version = "5.18.0"
+        }
+      }
+    }
+
+    provider "cloudflare" {}
+  EOF
+
+  gcp_provider_contents = <<-EOF
+    terraform {
+      required_providers {
+        google = {
+          source  = "hashicorp/google"
+          version = "~> 6.0"
+        }
+      }
+    }
+
+    provider "google" {
+      impersonate_service_account = "${local.gcp_provider_sa}"
+    }
+  EOF
+
+  provider_contents = (
+    local.platform == "aws" ? local.aws_provider_contents :
+    local.platform == "gcp" ? local.gcp_provider_contents :
+    local.platform == "cloudflare" ? local.cloudflare_provider_contents :
+    ""
+  )
 }
 
-# ── AWS ──────────────────────────────────────────────────────────────────────
+# ── Provider ──────────────────────────────────────────────────────────────────
 
-generate "aws_provider" {
-  disable   = local.platform != "aws"
+generate "provider" {
   path      = "provider.tf"
   if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-provider "aws" {
-  region = "${local.aws_region}"
-  default_tags {
-    tags = {
-      platform    = "${local.platform}"
-      project     = "${local.project}"
-      creator     = "${local.creator}"
-      team        = "${local.team}"
-      environment = "${local.env}"
-    }
-  }
-  assume_role {
-    role_arn = "${local.iam_role}"
-  }
-}
-EOF
+  contents  = local.provider_contents
 }
 
-generate "aws_backend" {
-  disable   = local.platform != "aws"
-  path      = "backend.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-terraform {
-  backend "s3" {
+# ── Remote state ─────────────────────────────────────────────────────────────
+
+remote_state {
+  backend = local.platform == "gcp" ? "gcs" : "s3"
+
+  config = local.platform == "gcp" ? {
+    bucket = local.gcp_state_bucket
+    prefix = trimprefix(path_relative_to_include(), "infrastructure/gcp/")
+    } : {
     encrypt        = true
     bucket         = "${local.state_account_name}-${local.platform}-${local.project}-tf-states"
     key            = "${trimprefix(path_relative_to_include(), "infrastructure/")}/terraform.tfstate"
-    region         = "${local.bucket_region}"
+    region         = local.bucket_region
     dynamodb_table = "${local.state_account_name}-${local.platform}-${local.project}-tf-locks"
-    assume_role    = { role_arn = "${local.state_role_arn}" }
+    assume_role    = { role_arn = local.state_role_arn }
   }
-}
-EOF
-}
 
-# ── Cloudflare ────────────────────────────────────────────────────────────────
-
-generate "cloudflare_provider" {
-  disable   = local.platform != "cloudflare"
-  path      = "provider.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-terraform {
-  required_providers {
-    cloudflare = {
-      source  = "cloudflare/cloudflare"
-      version = "5.18.0"
-    }
+  generate = {
+    path      = "backend.tf"
+    if_exists = "overwrite_terragrunt"
   }
-}
-
-provider "cloudflare" {}
-EOF
-}
-
-generate "cloudflare_backend" {
-  disable   = local.platform != "cloudflare"
-  path      = "backend.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-terraform {
-  backend "s3" {
-    encrypt        = true
-    bucket         = "${local.state_account_name}-${local.platform}-${local.project}-tf-states"
-    key            = "${trimprefix(path_relative_to_include(), "infrastructure/")}/terraform.tfstate"
-    region         = "${local.bucket_region}"
-    dynamodb_table = "${local.state_account_name}-${local.platform}-${local.project}-tf-locks"
-    assume_role    = { role_arn = "${local.state_role_arn}" }
-  }
-}
-EOF
-}
-
-# ── GCP ───────────────────────────────────────────────────────────────────────
-
-generate "gcp_provider" {
-  disable   = local.platform != "gcp"
-  path      = "provider.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-terraform {
-  required_providers {
-    google = {
-      source  = "hashicorp/google"
-      version = "~> 6.0"
-    }
-  }
-}
-
-provider "google" {
-  impersonate_service_account = "${local.gcp_provider_sa}"
-}
-EOF
-}
-
-generate "gcp_backend" {
-  disable   = local.platform != "gcp"
-  path      = "backend.tf"
-  if_exists = "overwrite_terragrunt"
-  contents  = <<EOF
-terraform {
-  backend "gcs" {
-    bucket = "${local.gcp_state_bucket}"
-    prefix = "${trimprefix(path_relative_to_include(), "infrastructure/gcp/")}"
-  }
-}
-EOF
 }
