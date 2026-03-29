@@ -6,7 +6,7 @@ locals {
   # Per-org GCP config — mirrors account.hcl for AWS.
   gcp_org_vars = try(read_terragrunt_config(find_in_parent_folders("org.hcl")), { locals = { service_account = "", state_project_name = "" } })
   # Per-project GCP config — mirrors per-account account.hcl for AWS.
-  gcp_project_vars = try(read_terragrunt_config(find_in_parent_folders("project.hcl")), { locals = { project_name = "" } })
+  gcp_project_vars = try(read_terragrunt_config(find_in_parent_folders("project.hcl")), { locals = { project_name = "", project_id = "", project_region = "" } })
 
   platform     = local.platform_vars.locals.platform
   account_name = local.account_vars.locals.account_name
