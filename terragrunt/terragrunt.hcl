@@ -43,9 +43,10 @@ locals {
   # objects (which HCL rejects). jsondecode() then converts the winner back to
   # a dynamic value accepted by remote_state.config.
   gcs_config_json = jsonencode({
-    bucket  = local.gcp_state_bucket
-    prefix  = trimprefix(path_relative_to_include(), "infrastructure/gcp/")
-    project = "project-c0cea0c3-cf00-4dc8-b6d"
+    bucket   = local.gcp_state_bucket
+    prefix   = trimprefix(path_relative_to_include(), "infrastructure/gcp/")
+    project  = "project-c0cea0c3-cf00-4dc8-b6d"
+    location = "asia-south1"
   })
 
   s3_config_json = jsonencode({
