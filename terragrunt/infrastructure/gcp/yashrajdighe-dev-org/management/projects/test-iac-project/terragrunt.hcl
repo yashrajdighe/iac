@@ -14,8 +14,7 @@ terraform {
 }
 
 inputs = {
-  name       = "test-iac-project"
-  project_id = "test-iac-project"
-  # project_id = "test-iac-project-${local.env}"
-  org_id = local.org_id
+  name       = "just-another-test-project"
+  project_id = "just-another-test-project"
+  org_id     = local.org_id
 }

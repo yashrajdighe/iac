@@ -14,6 +14,6 @@ terraform {
 }
 
 inputs = {
-  name   = "iac"
+  name   = "just-another-test-folder"
   parent = "organizations/${local.org_id}"
 }
