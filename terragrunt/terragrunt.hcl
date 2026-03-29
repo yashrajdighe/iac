@@ -37,6 +37,27 @@ locals {
   # Per-org provider identity — impersonated by the provider (level 2, mirrors iam_role per AWS account).
   gcp_provider_sa = local.gcp_org_vars.locals.service_account
 
+  # ── Backend configs as JSON strings ──────────────────────────────────────
+  # Each config is pre-serialised to a string so the ternary in remote_state
+  # compares two strings (consistent types) rather than two differently-shaped
+  # objects (which HCL rejects). jsondecode() then converts the winner back to
+  # a dynamic value accepted by remote_state.config.
+  gcs_config_json = jsonencode({
+    bucket = local.gcp_state_bucket
+    prefix = trimprefix(path_relative_to_include(), "infrastructure/gcp/")
+  })
+
+  s3_config_json = jsonencode({
+    encrypt        = true
+    bucket         = "${local.state_account_name}-${local.platform}-${local.project}-tf-states"
+    key            = "${trimprefix(path_relative_to_include(), "infrastructure/")}/terraform.tfstate"
+    region         = local.bucket_region
+    dynamodb_table = "${local.state_account_name}-${local.platform}-${local.project}-tf-locks"
+    assume_role    = { role_arn = local.state_role_arn }
+  })
+
+  backend_config_json = local.platform == "gcp" ? local.gcs_config_json : local.s3_config_json
+
   # ── Provider contents (one per platform) ─────────────────────────────────
   aws_provider_contents = <<-EOF
     provider "aws" {
@@ -105,19 +126,7 @@ generate "provider" {
 remote_state {
   backend = local.platform == "gcp" ? "gcs" : "s3"
 
-  config = jsondecode(jsonencode(
-    local.platform == "gcp" ? {
-      bucket = local.gcp_state_bucket
-      prefix = trimprefix(path_relative_to_include(), "infrastructure/gcp/")
-      } : {
-      encrypt        = true
-      bucket         = "${local.state_account_name}-${local.platform}-${local.project}-tf-states"
-      key            = "${trimprefix(path_relative_to_include(), "infrastructure/")}/terraform.tfstate"
-      region         = local.bucket_region
-      dynamodb_table = "${local.state_account_name}-${local.platform}-${local.project}-tf-locks"
-      assume_role    = { role_arn = local.state_role_arn }
-    }
-  ))
+  config = jsondecode(local.backend_config_json)
 
   generate = {
     path      = "backend.tf"
