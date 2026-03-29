@@ -45,8 +45,8 @@ locals {
   gcs_config_json = jsonencode({
     bucket   = local.gcp_state_bucket
     prefix   = trimprefix(path_relative_to_include(), "infrastructure/gcp/")
-    project  = "project-c0cea0c3-cf00-4dc8-b6d"
-    location = "asia-south1"
+    project  = local.gcp_project_vars.locals.project_id
+    location = local.gcp_project_vars.locals.project_region
   })
 
   s3_config_json = jsonencode({
