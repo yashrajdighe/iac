@@ -105,17 +105,19 @@ generate "provider" {
 remote_state {
   backend = local.platform == "gcp" ? "gcs" : "s3"
 
-  config = local.platform == "gcp" ? {
-    bucket = local.gcp_state_bucket
-    prefix = trimprefix(path_relative_to_include(), "infrastructure/gcp/")
-    } : {
-    encrypt        = true
-    bucket         = "${local.state_account_name}-${local.platform}-${local.project}-tf-states"
-    key            = "${trimprefix(path_relative_to_include(), "infrastructure/")}/terraform.tfstate"
-    region         = local.bucket_region
-    dynamodb_table = "${local.state_account_name}-${local.platform}-${local.project}-tf-locks"
-    assume_role    = { role_arn = local.state_role_arn }
-  }
+  config = jsondecode(jsonencode(
+    local.platform == "gcp" ? {
+      bucket = local.gcp_state_bucket
+      prefix = trimprefix(path_relative_to_include(), "infrastructure/gcp/")
+      } : {
+      encrypt        = true
+      bucket         = "${local.state_account_name}-${local.platform}-${local.project}-tf-states"
+      key            = "${trimprefix(path_relative_to_include(), "infrastructure/")}/terraform.tfstate"
+      region         = local.bucket_region
+      dynamodb_table = "${local.state_account_name}-${local.platform}-${local.project}-tf-locks"
+      assume_role    = { role_arn = local.state_role_arn }
+    }
+  ))
 
   generate = {
     path      = "backend.tf"
