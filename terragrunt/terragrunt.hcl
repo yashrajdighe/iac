@@ -103,6 +103,7 @@ locals {
     }
 
     provider "google" {
+      impersonate_service_account = "${local.gcp_provider_sa}"
     }
   EOF
 
