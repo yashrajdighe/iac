@@ -8,4 +8,7 @@ terraform {
 }
 
 provider "google" {
+  default_labels = {
+    tg_path = "${tg_path}"
+  }
 }

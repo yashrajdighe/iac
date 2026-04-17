@@ -81,6 +81,17 @@ locals {
   # ── Provider generation ──────────────────────────────────────────────────
   # Templates live under _shared/providers/<platform>.tftpl and are rendered
   # here (the only place with access to both cfg and the hierarchy).
+
+  # Path of the resource within the terragrunt/ directory, e.g.
+  #   "infrastructure/gcp/<org>/<folder>/projects/<project>".
+  # Injected into each provider as a default tag/label so every provisioned
+  # resource can be traced back to its Terragrunt configuration.
+  tg_path = path_relative_to_include()
+
+  # GCP label values must match [\p{Ll}\p{Lo}\p{N}_-]{0,63}; slashes are not
+  # allowed, so we substitute "/" with "__" for the GCP variant only.
+  tg_path_gcp_label = replace(lower(local.tg_path), "/", "__")
+
   provider_vars_map = {
     aws = {
       platform    = local.cfg.platform
@@ -90,8 +101,12 @@ locals {
       environment = lookup(local.env_vars.locals, "env", "")
       aws_region  = lookup(local.region_vars.locals, "aws_region", "")
       iam_role    = lookup(local.account_vars.locals, "iam_role", "")
+      tg_path     = local.tg_path
     }
-    gcp        = {}
+    gcp = {
+      tg_path = local.tg_path_gcp_label
+    }
+    # Cloudflare provider has no default_tags equivalent, so nothing to inject.
     cloudflare = {}
   }
 
