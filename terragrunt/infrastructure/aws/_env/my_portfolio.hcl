@@ -1,5 +1,5 @@
 terraform {
-  source = "${find_in_parent_folders("modules/aws")}/static_web_deployment"
+  source = "${find_in_parent_folders("modules")}/aws/static_web_deployment"
 }
 
 inputs = {

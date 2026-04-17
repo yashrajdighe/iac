@@ -3,40 +3,9 @@ include "root" {
   expose = true
 }
 
-include "region" {
-  path   = find_in_parent_folders("region.hcl")
-  expose = true
-}
-
-include "env" {
-  path   = find_in_parent_folders("env.hcl")
-  expose = true
-}
-
-include "account" {
-  path   = find_in_parent_folders("account.hcl")
-  expose = true
-}
-
 terraform {
-  source = "../../../../../../modules/aws/static_web_deployment"
+  source = "${find_in_parent_folders("modules")}/aws/static_web_deployment"
 }
-
-#dependency "<resource-name>" {
-#  config_path = "../<terragrunt-file-relative-path>"
-
-#  mock_outputs = {
-#    # define mock outputs here
-#  }
-#}
-
-#dependencies {
-#  paths = ["../dependent-resource-terragrunt-file-relative-path"]
-#}
-
-#locals {
-# define locals here
-#}
 
 inputs = {
   create_static_web_deployment   = false
@@ -64,5 +33,5 @@ inputs = {
 
   default_root_object = "index.html"
   github_repo_name    = "my-portfolio"
-  environment_name    = "${include.env.locals.env}"
+  environment_name    = include.root.locals.hierarchy.env.env
 }

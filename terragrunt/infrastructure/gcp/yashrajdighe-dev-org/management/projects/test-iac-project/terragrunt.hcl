@@ -2,8 +2,12 @@ include "root" {
   path = find_in_parent_folders()
 }
 
+terraform {
+  source = "${find_in_parent_folders("modules")}/gcp/gcp_project"
+}
+
 dependency "gcp_folder" {
-  config_path = "../../folders/test-folder/"
+  config_path = "../../folders/test-folder"
 
   mock_outputs = {
     id = "gcp-folder-id"
@@ -11,18 +15,7 @@ dependency "gcp_folder" {
 }
 
 dependencies {
-  paths = ["../../folders/test-folder/"]
-}
-
-locals {
-  org_vars = read_terragrunt_config(find_in_parent_folders("org.hcl"))
-
-  org_id   = local.org_vars.locals.org_id
-  root_dir = dirname(find_in_parent_folders())
-}
-
-terraform {
-  source = "${local.root_dir}/../modules/gcp/gcp_project"
+  paths = ["../../folders/test-folder"]
 }
 
 inputs = {
