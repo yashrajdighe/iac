@@ -20,6 +20,6 @@ dependencies {
 
 inputs = {
   name       = "just-another-test-project"
-  project_id = "just-another-test-project"
+  project_id = "just-another-test-project-12345"
   folder_id  = dependency.gcp_folder.outputs.id
 }
