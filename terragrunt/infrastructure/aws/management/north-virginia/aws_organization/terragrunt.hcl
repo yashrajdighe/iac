@@ -1,25 +1,9 @@
 include "root" {
-  path   = find_in_parent_folders()
-  expose = true
-}
-
-include "region" {
-  path   = find_in_parent_folders("region.hcl")
-  expose = true
-}
-
-include "env" {
-  path   = find_in_parent_folders("env.hcl")
-  expose = true
-}
-
-include "account" {
-  path   = find_in_parent_folders("account.hcl")
-  expose = true
+  path = find_in_parent_folders()
 }
 
 terraform {
-  source = "${find_in_parent_folders("modules/aws")}/aws_organization"
+  source = "${find_in_parent_folders("modules")}/aws/aws_organization"
 }
 
 inputs = {
@@ -27,7 +11,7 @@ inputs = {
     "cloudtrail.amazonaws.com",
     "config.amazonaws.com",
     "sso.amazonaws.com",
-    "member.org.stacksets.cloudformation.amazonaws.com"
+    "member.org.stacksets.cloudformation.amazonaws.com",
   ]
   feature_set = "ALL"
 }

@@ -1,0 +1,15 @@
+provider "aws" {
+  region = "${aws_region}"
+  default_tags {
+    tags = {
+      platform    = "${platform}"
+      project     = "${project}"
+      creator     = "${creator}"
+      team        = "${team}"
+      environment = "${environment}"
+    }
+  }
+  assume_role {
+    role_arn = "${iam_role}"
+  }
+}
