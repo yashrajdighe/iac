@@ -13,7 +13,7 @@ inputs = {
     "test-iac" = {
       name    = "test-iac"
       type    = "A"
-      content = "103.101.109.98"
+      content = "103.101.109.99"
       proxied = true
     }
   }
