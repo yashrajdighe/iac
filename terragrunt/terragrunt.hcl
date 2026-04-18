@@ -89,8 +89,29 @@ locals {
   tg_path = path_relative_to_include()
 
   # GCP label values must match [\p{Ll}\p{Lo}\p{N}_-]{0,63}; slashes are not
-  # allowed, so we substitute "/" with "__" for the GCP variant only.
-  tg_path_gcp_label = replace(lower(local.tg_path), "/", "__")
+  # allowed, so we substitute "/" with "__" for the GCP variant.
+  #
+  # Additionally, the full tg_path frequently exceeds 63 chars. We:
+  #   1. Strip the constant "infrastructure/gcp/" prefix (all GCP resources
+  #      live under it, so it carries zero information in a GCP-only label).
+  #   2. Scrub any stray character that isn't in [a-z0-9_-] to "_", so unusual
+  #      directory names (dots, spaces, unicode, etc.) can't break the label.
+  #   3. If the result still exceeds 63 chars, keep the first 55 chars and
+  #      append "_" + 7-char md5 of the full value, preserving uniqueness.
+  tg_path_gcp_raw = replace(
+    replace(
+      lower(trimprefix(local.tg_path, "infrastructure/gcp/")),
+      "/",
+      "__",
+    ),
+    "/[^a-z0-9_-]/",
+    "_",
+  )
+  tg_path_gcp_label = (
+    length(local.tg_path_gcp_raw) <= 63
+    ? local.tg_path_gcp_raw
+    : "${substr(local.tg_path_gcp_raw, 0, 55)}_${substr(md5(local.tg_path_gcp_raw), 0, 7)}"
+  )
 
   provider_vars_map = {
     aws = {
