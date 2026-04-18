@@ -1,21 +1,5 @@
 include "root" {
-  path   = find_in_parent_folders()
-  expose = true
-}
-
-include "region" {
-  path   = find_in_parent_folders("region.hcl")
-  expose = true
-}
-
-include "env" {
-  path   = find_in_parent_folders("env.hcl")
-  expose = true
-}
-
-include "account" {
-  path   = find_in_parent_folders("account.hcl")
-  expose = true
+  path = find_in_parent_folders()
 }
 
 include "common_inputs" {
@@ -23,24 +7,8 @@ include "common_inputs" {
 }
 
 terraform {
-  source = "${find_in_parent_folders("modules/aws")}/aws_cloudformation_stackset"
+  source = "${find_in_parent_folders("modules")}/aws/aws_cloudformation_stackset"
 }
-
-#dependency "<resource-name>" {
-#  config_path = "../<terragrunt-file-relative-path>"
-
-#  mock_outputs = {
-#    # define mock outputs here
-#  }
-#}
-
-#dependencies {
-#  paths = ["../dependent-resource-terragrunt-file-relative-path"]
-#}
-
-#locals {
-# define locals here
-#}
 
 inputs = {
   name                    = "GitHub-OIDC-Provider"

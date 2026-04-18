@@ -1,5 +1,5 @@
 terraform {
-  source = "${find_in_parent_folders("modules/aws")}/aws_budgets"
+  source = "${find_in_parent_folders("modules")}/aws/aws_budgets"
 }
 
 inputs = {
