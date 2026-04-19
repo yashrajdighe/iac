@@ -8,18 +8,22 @@ output "s3_buckets" {
   }
 }
 
-output "cloudfront_distributions" {
-  description = "Map of CloudFront distributions created for static web deployment"
-  value = {
-    for path, distribution in aws_cloudfront_distribution.this : path => {
-      id             = distribution.id
-      domain_name    = distribution.domain_name
-      hosted_zone_id = distribution.hosted_zone_id
-    }
-  }
+output "cloudfront_distribution_id" {
+  description = "ID of the CloudFront distribution"
+  value       = try(aws_cloudfront_distribution.this[0].id, null)
+}
+
+output "cloudfront_distribution_domain_name" {
+  description = "Domain name of the CloudFront distribution (e.g. d111111abcdef8.cloudfront.net)"
+  value       = try(aws_cloudfront_distribution.this[0].domain_name, null)
+}
+
+output "cloudfront_distribution_hosted_zone_id" {
+  description = "Route 53 hosted zone ID for the CloudFront distribution (for alias records)"
+  value       = try(aws_cloudfront_distribution.this[0].hosted_zone_id, null)
 }
 
 output "origin_access_control_id" {
   description = "ID of the CloudFront Origin Access Control"
-  value       = try(coalesce(one(aws_cloudfront_origin_access_control.this[*].id), null), null)
+  value       = try(aws_cloudfront_origin_access_control.this[0].id, null)
 }
