@@ -21,10 +21,20 @@ resource "aws_s3_bucket_policy" "this" {
   }
 }
 
+resource "aws_cloudfront_function" "viewer_request" {
+  count = var.create_static_web_deployment ? 1 : 0
+
+  name    = "${var.static_web_deployment_name}-viewer-request"
+  runtime = var.cloudfront_viewer_request_function_runtime
+  publish = true
+  comment = "Directory trailing-slash redirect and index.html rewrite for ${var.static_web_deployment_name}"
+  code    = file("${path.module}/viewer_request.js")
+}
+
 resource "aws_cloudfront_distribution" "this" {
   count = var.create_static_web_deployment ? 1 : 0
 
-  depends_on = [aws_s3_bucket.this]
+  depends_on = [aws_s3_bucket.this, aws_cloudfront_function.viewer_request]
 
   dynamic "origin" {
     for_each = var.origins
@@ -41,6 +51,11 @@ resource "aws_cloudfront_distribution" "this" {
     allowed_methods        = ["DELETE", "GET", "HEAD", "OPTIONS", "PATCH", "POST", "PUT"]
     cached_methods         = ["GET", "HEAD"]
     cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # AWS Managed Cache Policy: CachingDisabled
+
+    function_association {
+      event_type   = "viewer-request"
+      function_arn = aws_cloudfront_function.viewer_request[0].arn
+    }
   }
 
   dynamic "ordered_cache_behavior" {
@@ -52,6 +67,11 @@ resource "aws_cloudfront_distribution" "this" {
       cached_methods         = ["GET", "HEAD"]
       viewer_protocol_policy = "redirect-to-https"
       cache_policy_id        = "4135ea2d-6df8-44a3-9df3-4b5a84be39ad" # AWS Managed Cache Policy: CachingDisabled
+
+      function_association {
+        event_type   = "viewer-request"
+        function_arn = aws_cloudfront_function.viewer_request[0].arn
+      }
     }
   }
 

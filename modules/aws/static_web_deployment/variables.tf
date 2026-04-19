@@ -48,6 +48,12 @@ variable "default_root_object" {
 
 }
 
+variable "cloudfront_viewer_request_function_runtime" {
+  description = "Runtime for the CloudFront viewer-request function (directory slash redirect and index.html rewrite)"
+  type        = string
+  default     = "cloudfront-js-2.0"
+}
+
 variable "tags" {
   description = "Tags to apply to the resources"
   type        = map(string)
