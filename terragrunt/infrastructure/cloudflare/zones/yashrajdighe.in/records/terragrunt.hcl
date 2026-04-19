@@ -9,6 +9,9 @@ dependency "my_portfolio" {
   mock_outputs = {
     cloudfront_distribution_domain_name = "d111111abcdef8.cloudfront.net"
   }
+
+  # Merge mocks into existing state so new root outputs (not yet in state) do not break parsing.
+  mock_outputs_merge_strategy_with_state = "shallow"
 }
 
 dependencies {
