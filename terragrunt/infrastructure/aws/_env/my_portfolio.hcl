@@ -20,4 +20,10 @@ inputs = {
 
   default_root_object             = "index.html"
   cloudflare_api_token_secret_arn = "arn:aws:secretsmanager:ap-south-1:530354880605:secret:/common/github/yd-devops-hub/global/CLOUDFLARE_API_TOKEN-VjcxZF"
+
+  create_mtls_trust_store = true
+  mtls_rotator_account_id = "530354880605"
+  mtls_rotator_role_name  = "cloudflare-origin-cert-rotator-role"
+  # Must match rotator: default S3 key is {normalized resource_name_prefix}root-ca.pem (e.g. devops-playground-in-root-ca.pem) unless trust_store is overridden
+  mtls_trust_store_object_key = "devops-playground-in-root-ca.pem"
 }

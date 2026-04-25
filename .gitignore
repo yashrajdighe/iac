@@ -1,6 +1,9 @@
 # Local .terraform directories
 **/.terraform/*
 
+# Provider lock files (OpenTofu/Terraform) — ignore in all directories
+**/.terraform.lock.hcl
+
 # .tfstate files
 *.tfstate
 *.tfstate.*
@@ -36,3 +39,8 @@ override.tf.json
 .terraformrc
 terraform.rc
 .venv
+
+# Python
+**/__pycache__/
+*.py[cod]
+*$py.class

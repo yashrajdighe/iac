@@ -105,3 +105,33 @@ variable "kms_key_arn" {
   type        = string
   default     = ""
 }
+
+variable "create_mtls_trust_store" {
+  description = "If true, create a dedicated S3 bucket for the Cloudflare origin mTLS root CA (root-ca.pem) and allow the rotator role to Put/Get the object (cross-account)."
+  type        = bool
+  default     = false
+}
+
+variable "mtls_rotator_account_id" {
+  description = "AWS account ID of the org common account that runs the Cloudflare origin cert rotator Lambda (for bucket policy principal)."
+  type        = string
+  default     = ""
+}
+
+variable "mtls_rotator_role_name" {
+  description = "IAM role name of the rotator Lambda (e.g. cloudflare-origin-cert-rotator-role), used in the S3 bucket policy."
+  type        = string
+  default     = ""
+}
+
+variable "mtls_trust_store_bucket_name" {
+  description = "Override S3 bucket name for mTLS root CA. If empty, static_web_deployment_name-mtls-trust-store is used (see local.mtls_trust_store_name)."
+  type        = string
+  default     = ""
+}
+
+variable "mtls_trust_store_object_key" {
+  description = "S3 object key for the root CA public PEM. Must match the common-account rotator module input trust_store_s3_object_key."
+  type        = string
+  default     = "root-ca.pem"
+}
