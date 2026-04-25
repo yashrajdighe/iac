@@ -35,5 +35,5 @@ inputs = {
   environment_name           = include.root.locals.hierarchy.env.env
   kms_key_arn                = dependency.kms_cmk.outputs.kms_key_arn
   aliases                    = ["dev.yashrajdighe.in"]
-  acm_certificate_arn        = dependency.yd_acm_cert_development.outputs.certificate_arn
+  acm_certificate_arn        = dependency.yd_acm_cert_development.outputs.arn
 }
