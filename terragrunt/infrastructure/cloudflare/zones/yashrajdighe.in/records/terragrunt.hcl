@@ -127,20 +127,27 @@ inputs = {
       ).resource_record_value
       proxied = false
     }
-    # Production includes apex + wildcard. ACM still emits two DVOs (one per domain_name), but they usually
-    # share the same CNAME, so a single Cloudflare record satisfies both. Dedupe by resource_record_name, then
-    # take the one record (if ACM ever used distinct CNAMEs, this map would have multiple keys and you would
-    # need one record per key).
+    # Production includes apex + wildcard. ACM emits two DVOs that often share the same CNAME. Duplicate
+    # resource_record_name values must use => o... (grouping); then take any element — they are equivalent.
     "*-yashrajdighe-in-cert-verification-production" = {
-      name = one(values({
-        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o.resource_record_name => o
-      })).resource_record_name
-      type = one(values({
-        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o.resource_record_name => o
-      })).resource_record_type
-      content = one(values({
-        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o.resource_record_name => o
-      })).resource_record_value
+      name = element(
+        one(values({
+          for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o.resource_record_name => o...
+        })),
+        0
+      ).resource_record_name
+      type = element(
+        one(values({
+          for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o.resource_record_name => o...
+        })),
+        0
+      ).resource_record_type
+      content = element(
+        one(values({
+          for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o.resource_record_name => o...
+        })),
+        0
+      ).resource_record_value
       proxied = false
     }
   }
