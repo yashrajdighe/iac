@@ -23,6 +23,11 @@ output "cloudfront_distribution_hosted_zone_id" {
   value       = try(aws_cloudfront_distribution.this[0].hosted_zone_id, null)
 }
 
+output "cloudfront_aliases" {
+  description = "Alternate domain names (CNAMEs) attached to the CloudFront distribution"
+  value       = try(aws_cloudfront_distribution.this[0].aliases, null)
+}
+
 output "origin_access_control_id" {
   description = "ID of the CloudFront Origin Access Control"
   value       = try(aws_cloudfront_origin_access_control.this[0].id, null)

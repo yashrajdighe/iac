@@ -82,8 +82,13 @@ resource "aws_cloudfront_distribution" "this" {
     }
   }
 
+  aliases = var.aliases
+
   viewer_certificate {
-    cloudfront_default_certificate = true
+    cloudfront_default_certificate = length(var.aliases) == 0
+    acm_certificate_arn            = length(var.aliases) > 0 ? var.acm_certificate_arn : null
+    ssl_support_method             = length(var.aliases) > 0 ? "sni-only" : null
+    minimum_protocol_version       = length(var.aliases) > 0 ? var.cloudfront_ssl_minimum_protocol_version : null
   }
 
   enabled = var.enable_cloudfront_distribution
@@ -93,6 +98,13 @@ resource "aws_cloudfront_distribution" "this" {
   default_root_object = var.default_root_object
 
   tags = var.tags
+
+  lifecycle {
+    precondition {
+      condition     = length(var.aliases) == 0 || var.acm_certificate_arn != ""
+      error_message = "When aliases is non-empty, acm_certificate_arn must be set to an ACM certificate in us-east-1 (required by CloudFront for custom hostnames)."
+    }
+  }
 }
 
 resource "aws_cloudfront_origin_access_control" "this" {
