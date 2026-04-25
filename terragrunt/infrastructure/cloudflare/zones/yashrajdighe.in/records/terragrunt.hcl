@@ -53,19 +53,20 @@ dependency "yd_acm_cert_staging" {
 dependency "yd_acm_cert_production" {
   config_path = "../../../../aws/production/north-virginia/yd_acm_cert"
 
+  # ACM still returns one DVO per subject name, but apex + wildcard often share the same CNAME; mocks mirror that.
   mock_outputs = {
     domain_validation_options = [
       {
         domain_name           = "*.yashrajdighe.in"
-        resource_record_name  = "_mock-prod-wild.acm-validations.aws"
+        resource_record_name  = "_mock-prod.acm-validations.aws"
         resource_record_type  = "CNAME"
-        resource_record_value = "mock-prod-wild.acm-validations.aws"
+        resource_record_value = "mock-prod.acm-validations.aws"
       },
       {
         domain_name           = "yashrajdighe.in"
-        resource_record_name  = "_mock-prod-apex.acm-validations.aws"
+        resource_record_name  = "_mock-prod.acm-validations.aws"
         resource_record_type  = "CNAME"
-        resource_record_value = "mock-prod-apex.acm-validations.aws"
+        resource_record_value = "mock-prod.acm-validations.aws"
       }
     ]
   }
@@ -126,35 +127,20 @@ inputs = {
       ).resource_record_value
       proxied = false
     }
-    # Production cert lists apex + wildcard; DVOs are selected by domain_name (set order is not stable).
+    # Production includes apex + wildcard. ACM still emits two DVOs (one per domain_name), but they usually
+    # share the same CNAME, so a single Cloudflare record satisfies both. Dedupe by resource_record_name, then
+    # take the one record (if ACM ever used distinct CNAMEs, this map would have multiple keys and you would
+    # need one record per key).
     "*-yashrajdighe-in-cert-verification-production" = {
-      name = one([
-        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
-        if o.domain_name == "*.yashrajdighe.in"
-      ]).resource_record_name
-      type = one([
-        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
-        if o.domain_name == "*.yashrajdighe.in"
-      ]).resource_record_type
-      content = one([
-        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
-        if o.domain_name == "*.yashrajdighe.in"
-      ]).resource_record_value
-      proxied = false
-    }
-    "*-yashrajdighe-in-cert-verification-production-apex" = {
-      name = one([
-        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
-        if o.domain_name == "yashrajdighe.in"
-      ]).resource_record_name
-      type = one([
-        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
-        if o.domain_name == "yashrajdighe.in"
-      ]).resource_record_type
-      content = one([
-        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
-        if o.domain_name == "yashrajdighe.in"
-      ]).resource_record_value
+      name = one(values({
+        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o.resource_record_name => o
+      })).resource_record_name
+      type = one(values({
+        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o.resource_record_name => o
+      })).resource_record_type
+      content = one(values({
+        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o.resource_record_name => o
+      })).resource_record_value
       proxied = false
     }
   }
