@@ -135,3 +135,9 @@ variable "mtls_trust_store_object_key" {
   type        = string
   default     = "root-ca.pem"
 }
+
+variable "mtls_trust_store_attach_rotator_policy" {
+  description = "If true (and create_mtls_trust_store is true), attach the bucket policy for the cross-account rotator role. The IAM role must already exist in mtls_rotator_account_id, or S3 returns MalformedPolicy/Invalid principal. If the rotator stack is not applied yet, set this false, apply, then apply cloudflare-origin-cert-rotator, then set this true and apply again."
+  type        = bool
+  default     = true
+}

@@ -31,4 +31,6 @@ inputs = {
   mtls_rotator_account_id     = "530354880605"
   mtls_rotator_role_name      = local.mtls_rotator.locals.mtls_rotator_role_name
   mtls_trust_store_object_key = local.mtls_rotator.locals.mtls_trust_store_object_key
+  # Cross-account S3 policy fails with MalformedPolicy/Invalid principal if the rotator role does not exist in the common account yet. Bootstrap: set false, apply this stack, apply common/mumbai/cloudflare-origin-cert-rotator, set true, apply this stack again.
+  mtls_trust_store_attach_rotator_policy = true
 }

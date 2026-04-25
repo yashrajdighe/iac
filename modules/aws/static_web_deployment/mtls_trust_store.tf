@@ -12,7 +12,7 @@ resource "aws_s3_bucket" "mtls_trust_store" {
 }
 
 data "aws_iam_policy_document" "mtls_trust_store" {
-  count = var.create_mtls_trust_store ? 1 : 0
+  count = var.create_mtls_trust_store && var.mtls_trust_store_attach_rotator_policy ? 1 : 0
 
   statement {
     effect = "Allow"
@@ -59,7 +59,7 @@ resource "aws_s3_bucket_server_side_encryption_configuration" "mtls_trust_store"
 }
 
 resource "aws_s3_bucket_policy" "mtls_trust_store" {
-  count  = var.create_mtls_trust_store ? 1 : 0
+  count  = var.create_mtls_trust_store && var.mtls_trust_store_attach_rotator_policy ? 1 : 0
   bucket = aws_s3_bucket.mtls_trust_store[0].id
   policy = data.aws_iam_policy_document.mtls_trust_store[0].json
 
