@@ -3,10 +3,10 @@ check "create_requires_inputs" {
     condition = !var.create || (
       coalesce(var.cloudflare_zone_id, "") != "" &&
       coalesce(var.cloudflare_api_token_secret_arn, "") != "" &&
-      coalesce(var.lambda_layer_arn, "") != "" &&
+      coalesce(var.lambda_layer_name, "") != "" &&
       length(var.trust_store_bucket_arns) > 0
     )
-    error_message = "When create is true, set non-empty cloudflare_zone_id, cloudflare_api_token_secret_arn, lambda_layer_arn, and at least one trust_store_bucket_arn."
+    error_message = "When create is true, set non-empty cloudflare_zone_id, cloudflare_api_token_secret_arn, lambda_layer_name, and at least one trust_store_bucket_arn."
   }
 
   assert {
@@ -85,7 +85,7 @@ resource "aws_lambda_function" "this" {
   filename         = data.archive_file.lambda_zip[0].output_path
   source_code_hash = data.archive_file.lambda_zip[0].output_base64sha256
 
-  layers = [var.lambda_layer_arn]
+  layers = [data.aws_lambda_layer_version.lambda_deps[0].arn]
 
   environment {
     variables = {

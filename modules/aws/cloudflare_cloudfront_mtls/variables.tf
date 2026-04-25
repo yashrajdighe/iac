@@ -43,11 +43,10 @@ variable "trust_store_bucket_arns" {
   default     = []
 }
 
-variable "lambda_layer_arn" {
-  description = "Lambda layer with cryptography and requests (e.g. prBotSecurityLibrary). Required when create is true; may be null when create is false."
+variable "lambda_layer_name" {
+  description = "Lambda layer name or full layer ARN without the :version suffix (e.g. prBotSecurityLibrary or arn:aws:lambda:region:account:layer:name). The module resolves the latest published version on each apply."
   type        = string
-  default     = null
-  nullable    = true
+  default     = "prBotSecurityLibrary"
 }
 
 variable "client_cert_validity_days" {

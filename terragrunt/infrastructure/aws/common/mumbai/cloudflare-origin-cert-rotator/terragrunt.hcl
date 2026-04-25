@@ -42,13 +42,19 @@ terraform {
   source = "${find_in_parent_folders("modules")}/aws/cloudflare_cloudfront_mtls"
 }
 
+locals {
+  mtls_rotator = read_terragrunt_config(
+    find_in_parent_folders("_env/mtls_rotator_shared.hcl", "${get_terragrunt_dir()}/terragrunt.hcl")
+  )
+}
+
 inputs = {
-  resource_name_prefix = "devops-playground-in"
+  resource_name_prefix = local.mtls_rotator.locals.mtls_resource_name_prefix
+  function_name        = local.mtls_rotator.locals.mtls_function_name
 
   cloudflare_zone_id = "35382e17c94bbbeedef73e026144798f" # devops-playground.in
 
-  # Update if you rotate or rename the common-account secret.
-  cloudflare_api_token_secret_arn = "arn:aws:secretsmanager:ap-south-1:530354880605:secret:/common/github/yashrajdighe/iac/CLOUDFLARE_API_TOKEN-eefAwH"
+  cloudflare_api_token_secret_arn = local.mtls_rotator.locals.cloudflare_api_token_secret_arn
 
   trust_store_bucket_arns = [
     dependency.my_portfolio_development.outputs.mtls_trust_store_bucket_arn,
@@ -56,9 +62,8 @@ inputs = {
     dependency.my_portfolio_production.outputs.mtls_trust_store_bucket_arn,
   ]
 
-  # trust_store_s3_object_key: omit to use default (resource_name_prefix + root-ca.pem, e.g. devops-playground-in-root-ca.pem). Must match _env/my_portfolio.hcl mtls_trust_store_object_key
-
-  lambda_layer_arn = "arn:aws:lambda:ap-south-1:530354880605:layer:prBotSecurityLibrary:1"
+  # trust_store_s3_object_key: omit to use default; object key is derived from _env/mtls_rotator_shared.hcl (keep in sync with my-portfolio)
+  # lambda_layer_name: module default (prBotSecurityLibrary) — latest version resolved at apply
 
   # Short-lived values for testing (revert to e.g. 30 / 3650 / 120 for production)
   client_cert_validity_days = 2

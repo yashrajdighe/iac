@@ -47,3 +47,13 @@ output "create" {
   description = "Whether the module created rotator resources."
   value       = var.create
 }
+
+output "lambda_layer_arn" {
+  description = "Lambda layer ARN actually attached (latest published version for lambda_layer_name at apply time)."
+  value       = try(data.aws_lambda_layer_version.lambda_deps[0].arn, null)
+}
+
+output "lambda_layer_version" {
+  description = "Lambda layer version number attached (latest for lambda_layer_name at apply time)."
+  value       = try(data.aws_lambda_layer_version.lambda_deps[0].version, null)
+}
