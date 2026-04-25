@@ -1,10 +1,3 @@
-data "aws_lambda_layer_version" "lambda_deps" {
-  count = var.create ? 1 : 0
-
-  layer_name = var.lambda_layer_name
-  version    = var.lambda_layer_version
-}
-
 data "aws_iam_policy_document" "lambda_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]

@@ -49,11 +49,13 @@ output "create" {
 }
 
 output "lambda_layer_arn" {
-  description = "Lambda layer ARN actually attached (lambda_layer_name + lambda_layer_version)."
-  value       = try(data.aws_lambda_layer_version.lambda_deps[0].arn, null)
+  description = "Lambda layer version ARN attached (var.lambda_layer_arn)."
+  value       = var.create ? var.lambda_layer_arn : null
 }
 
 output "lambda_layer_version" {
-  description = "Lambda layer version attached (var.lambda_layer_version)."
-  value       = var.create ? var.lambda_layer_version : null
+  description = "Numeric version from the end of var.lambda_layer_arn (Lambda layer version suffix)."
+  value = var.create && var.lambda_layer_arn != null ? tonumber(
+    element(split(":", var.lambda_layer_arn), length(split(":", var.lambda_layer_arn)) - 1)
+  ) : null
 }

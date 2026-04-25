@@ -43,16 +43,11 @@ variable "trust_store_bucket_arns" {
   default     = []
 }
 
-variable "lambda_layer_name" {
-  description = "Lambda layer name or full layer ARN without the :version suffix (e.g. prBotSecurityLibrary or arn:aws:lambda:region:account:layer:name)."
+variable "lambda_layer_arn" {
+  description = "Full ARN of the Lambda layer *version* to attach (include the trailing :<version>). Prefer the layer stack output (e.g. aws_lambda_layer) so the version always exists. Do not use a data source with a guessed version number."
   type        = string
-  default     = "prBotSecurityLibrary"
-}
-
-variable "lambda_layer_version" {
-  description = "Published layer version to attach (pinned; bump when you publish a new layer)."
-  type        = number
-  default     = 1
+  default     = null
+  nullable    = true
 }
 
 variable "client_cert_validity_days" {

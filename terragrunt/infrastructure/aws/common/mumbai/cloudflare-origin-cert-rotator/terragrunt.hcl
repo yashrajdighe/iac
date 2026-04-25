@@ -3,6 +3,15 @@ include "root" {
   expose = true
 }
 
+dependency "lambda_layer" {
+  config_path = "../lambda-layer"
+
+  mock_outputs = {
+    layer_arn = "arn:aws:lambda:ap-south-1:000000000000:layer:prBotSecurityLibrary:1"
+  }
+  mock_outputs_merge_strategy_with_state = "shallow"
+}
+
 dependency "my_portfolio_development" {
   config_path = "../../../development/north-virginia/my-portfolio"
 
@@ -32,6 +41,7 @@ dependency "my_portfolio_production" {
 
 dependencies {
   paths = [
+    "../lambda-layer",
     "../../../development/north-virginia/my-portfolio",
     "../../../staging/north-virginia/my-portfolio",
     "../../../production/north-virginia/my-portfolio",
@@ -63,8 +73,8 @@ inputs = {
   ]
 
   # trust_store_s3_object_key: omit to use default; object key is derived from _env/mtls_rotator_shared.hcl (keep in sync with my-portfolio)
-  lambda_layer_name    = "prBotSecurityLibrary"
-  lambda_layer_version = 1
+  # Layer version: use published ARN from the lambda-layer stack (do not hardcode :1; version must exist in the account).
+  lambda_layer_arn = dependency.lambda_layer.outputs.layer_arn
 
   # Short-lived values for testing (revert to e.g. 30 / 3650 / 120 for production)
   client_cert_validity_days = 2
