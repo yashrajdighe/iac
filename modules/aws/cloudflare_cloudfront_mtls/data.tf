@@ -1,6 +1,3 @@
-data "aws_caller_identity" "current" {}
-data "aws_region" "current" {}
-
 data "aws_iam_policy_document" "lambda_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
@@ -13,6 +10,8 @@ data "aws_iam_policy_document" "lambda_assume_role" {
 }
 
 data "aws_iam_policy_document" "lambda_execution" {
+  count = var.create ? 1 : 0
+
   # Log delivery: AWSLambdaBasicExecutionRole (attached) covers CreateLogGroup/Stream, PutLogEvents.
   statement {
     sid    = "OwnSecrets"
@@ -23,8 +22,8 @@ data "aws_iam_policy_document" "lambda_execution" {
       "secretsmanager:DescribeSecret",
     ]
     resources = [
-      aws_secretsmanager_secret.root_ca.arn,
-      aws_secretsmanager_secret.client.arn,
+      aws_secretsmanager_secret.root_ca[0].arn,
+      aws_secretsmanager_secret.client[0].arn,
     ]
   }
 

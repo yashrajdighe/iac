@@ -1,3 +1,9 @@
+variable "create" {
+  description = "If false, no AWS resources in this module are created (e.g. to disable the rotator in a stack). Set false only when you can omit the Cloudflare/Trust-store inputs or pass null/empty; see the module check block for required values when create is true."
+  type        = bool
+  default     = true
+}
+
 variable "resource_name_prefix" {
   description = "Optional prefix for all named resources in this module (Lambda, IAM role/policies, CloudWatch log group and rule, Secrets Manager secret path). Empty string preserves legacy names. Ending hyphens are normalized; e.g. 'acme' and 'acme-' both become 'acme-'. After changing this, update static_web_deployment mtls_rotator_role_name to match output lambda_role_name."
   type        = string
@@ -11,13 +17,17 @@ variable "function_name" {
 }
 
 variable "cloudflare_zone_id" {
-  description = "Cloudflare zone ID (v4 API)."
+  description = "Cloudflare zone ID (v4 API). Required when create is true; may be null when create is false."
   type        = string
+  default     = null
+  nullable    = true
 }
 
 variable "cloudflare_api_token_secret_arn" {
-  description = "Secrets Manager secret ARN for CLOUDFLARE_API_TOKEN in the same account (common)."
+  description = "Secrets Manager secret ARN for CLOUDFLARE_API_TOKEN in the same account (common). Required when create is true; may be null when create is false."
   type        = string
+  default     = null
+  nullable    = true
 }
 
 variable "trust_store_s3_object_key" {
@@ -28,18 +38,16 @@ variable "trust_store_s3_object_key" {
 }
 
 variable "trust_store_bucket_arns" {
-  description = "S3 bucket ARNs (e.g. arn:aws:s3:::bucket) for per-env mTLS root CA trust stores."
+  description = "S3 bucket ARNs (e.g. arn:aws:s3:::bucket) for per-env mTLS root CA trust stores. When create is true, at least one ARN is required; use [] when create is false."
   type        = list(string)
-
-  validation {
-    condition     = length(var.trust_store_bucket_arns) > 0
-    error_message = "At least one trust_store_bucket_arn is required (dev/staging/prod S3 trust-store buckets)."
-  }
+  default     = []
 }
 
 variable "lambda_layer_arn" {
-  description = "Lambda layer with cryptography and requests (e.g. prBotSecurityLibrary)."
+  description = "Lambda layer with cryptography and requests (e.g. prBotSecurityLibrary). Required when create is true; may be null when create is false."
   type        = string
+  default     = null
+  nullable    = true
 }
 
 variable "client_cert_validity_days" {
