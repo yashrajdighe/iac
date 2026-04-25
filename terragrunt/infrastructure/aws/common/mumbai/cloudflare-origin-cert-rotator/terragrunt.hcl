@@ -43,7 +43,7 @@ terraform {
 }
 
 inputs = {
-  function_name = "cloudflare-origin-cert-rotator"
+  resource_name_prefix = "devops-playground-in"
 
   cloudflare_zone_id = "35382e17c94bbbeedef73e026144798f" # devops-playground.in
 
@@ -56,8 +56,7 @@ inputs = {
     dependency.my_portfolio_production.outputs.mtls_trust_store_bucket_arn,
   ]
 
-  # S3 key for the public root CA in each trust-store bucket; must match _env/my_portfolio.hcl mtls_trust_store_object_key
-  trust_store_s3_object_key = "devops-playground-in/root-ca.pem"
+  # trust_store_s3_object_key: omit to use default (resource_name_prefix + root-ca.pem, e.g. devops-playground-in-root-ca.pem). Must match _env/my_portfolio.hcl mtls_trust_store_object_key
 
   lambda_layer_arn = "arn:aws:lambda:ap-south-1:530354880605:layer:prBotSecurityLibrary:1"
 

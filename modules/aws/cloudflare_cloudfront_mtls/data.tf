@@ -45,6 +45,6 @@ data "aws_iam_policy_document" "lambda_execution" {
       "s3:PutObject",
       "s3:GetObject",
     ]
-    resources = [for b in var.trust_store_bucket_arns : "${b}/${var.trust_store_s3_object_key}"]
+    resources = [for b in var.trust_store_bucket_arns : "${b}/${local.trust_store_s3_object_key}"]
   }
 }

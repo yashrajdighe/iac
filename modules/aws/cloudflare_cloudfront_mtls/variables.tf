@@ -1,5 +1,11 @@
+variable "resource_name_prefix" {
+  description = "Optional prefix for all named resources in this module (Lambda, IAM role/policies, CloudWatch log group and rule, Secrets Manager secret path). Empty string preserves legacy names. Ending hyphens are normalized; e.g. 'acme' and 'acme-' both become 'acme-'. After changing this, update static_web_deployment mtls_rotator_role_name to match output lambda_role_name."
+  type        = string
+  default     = ""
+}
+
 variable "function_name" {
-  description = "Name of the Lambda that rotates the Cloudflare origin client certificate."
+  description = "Base Lambda name; the deployed function name is resource_name_prefix (if any) plus this value, per locals.lambda_function_name."
   type        = string
   default     = "cloudflare-origin-cert-rotator"
 }
@@ -15,9 +21,10 @@ variable "cloudflare_api_token_secret_arn" {
 }
 
 variable "trust_store_s3_object_key" {
-  description = "S3 object key for the public root CA PEM in each trust-store bucket (e.g. root-ca.pem or mtls/root-ca.pem). Must match static_web_deployment's mtls_trust_store_object_key."
+  description = "S3 object key for the public root CA PEM. Leave null to use the default: normalized resource_name_prefix plus root-ca.pem (e.g. myprefix-root-ca.pem, or root-ca.pem if prefix is empty). Must match static_web_deployment mtls_trust_store_object_key."
   type        = string
-  default     = "root-ca.pem"
+  default     = null
+  nullable    = true
 }
 
 variable "trust_store_bucket_arns" {

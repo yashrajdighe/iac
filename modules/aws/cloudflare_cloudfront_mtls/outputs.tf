@@ -32,3 +32,13 @@ output "event_rule_name" {
   description = "EventBridge rule name for the rotation schedule."
   value       = aws_cloudwatch_event_rule.rotation.name
 }
+
+output "resource_name_prefix" {
+  description = "Effective prefix applied to resource names (normalized trailing hyphen), or empty string."
+  value       = local.resource_prefix
+}
+
+output "trust_store_s3_object_key" {
+  description = "Resolved S3 object key for the public root CA (var.trust_store_s3_object_key or default from resource_name_prefix + root-ca.pem)."
+  value       = local.trust_store_s3_object_key
+}

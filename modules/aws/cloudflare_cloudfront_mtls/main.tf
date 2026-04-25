@@ -8,37 +8,37 @@ check "root_ca_renew_window" {
 data "archive_file" "lambda_zip" {
   type        = "zip"
   source_dir  = "${path.module}/code"
-  output_path = "${path.module}/cloudflare_mtls_rotator.zip"
+  output_path = "${path.module}/${local.lambda_function_name}.zip"
 }
 
 resource "aws_secretsmanager_secret" "root_ca" {
-  name                    = "${var.secret_name_prefix}/root-ca"
+  name                    = "${local.secret_name_stem}/root-ca"
   recovery_window_in_days = var.secret_recovery_window_in_days
 
   tags = var.tags
 }
 
 resource "aws_secretsmanager_secret" "client" {
-  name                    = "${var.secret_name_prefix}/client-cert"
+  name                    = "${local.secret_name_stem}/client-cert"
   recovery_window_in_days = var.secret_recovery_window_in_days
 
   tags = var.tags
 }
 
 resource "aws_cloudwatch_log_group" "this" {
-  name              = "/aws/lambda/${var.function_name}"
+  name              = "/aws/lambda/${local.lambda_function_name}"
   retention_in_days = var.log_retention_in_days
   tags              = var.tags
 }
 
 resource "aws_iam_role" "this" {
-  name               = "${var.function_name}-role"
+  name               = "${local.lambda_function_name}-role"
   assume_role_policy = data.aws_iam_policy_document.lambda_assume_role.json
   tags               = var.tags
 }
 
 resource "aws_iam_role_policy" "lambda" {
-  name   = "${var.function_name}-execution"
+  name   = "${local.lambda_function_name}-execution"
   role   = aws_iam_role.this.id
   policy = data.aws_iam_policy_document.lambda_execution.json
 }
@@ -49,7 +49,7 @@ resource "aws_iam_role_policy_attachment" "basic" {
 }
 
 resource "aws_lambda_function" "this" {
-  function_name = var.function_name
+  function_name = local.lambda_function_name
   role          = aws_iam_role.this.arn
   handler       = "handler.lambda_handler"
   runtime       = "python3.14"
@@ -68,7 +68,7 @@ resource "aws_lambda_function" "this" {
       ROOT_CA_SECRET_ARN              = aws_secretsmanager_secret.root_ca.arn
       CLIENT_CERT_SECRET_ARN          = aws_secretsmanager_secret.client.arn
       TRUST_STORE_BUCKET_NAMES        = join(",", [for b in var.trust_store_bucket_arns : replace(b, "arn:aws:s3:::", "")])
-      TRUST_STORE_S3_OBJECT_KEY       = var.trust_store_s3_object_key
+      TRUST_STORE_S3_OBJECT_KEY       = local.trust_store_s3_object_key
       ROOT_CA_VALIDITY_DAYS           = tostring(var.root_ca_validity_days)
       ROOT_CA_RENEW_BEFORE_DAYS       = tostring(var.root_ca_renew_before_days)
       CLIENT_CERT_VALIDITY_DAYS       = tostring(var.client_cert_validity_days)
@@ -84,7 +84,7 @@ resource "aws_lambda_function" "this" {
 }
 
 resource "aws_cloudwatch_event_rule" "rotation" {
-  name                = "${var.function_name}-rotation"
+  name                = "${local.lambda_function_name}-rotation"
   description         = "Triggers Cloudflare origin client certificate rotation"
   schedule_expression = var.rotation_schedule
   tags                = var.tags
