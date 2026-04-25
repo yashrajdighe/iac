@@ -119,7 +119,7 @@ variable "mtls_rotator_account_id" {
 }
 
 variable "mtls_rotator_role_name" {
-  description = "IAM role name of the rotator Lambda (e.g. cloudflare-origin-cert-rotator-role), used in the S3 bucket policy."
+  description = "IAM role *name* only (not the full ARN), for the rotator Lambda in the common account. Must match the deployed role: if the rotator uses resource_name_prefix, the name is {prefix}{function_name}-role (e.g. devops-playground-in-cloudflare-origin-cert-rotator-role). Mismatches cause S3 PutBucketPolicy errors like Invalid principal."
   type        = string
   default     = ""
 }

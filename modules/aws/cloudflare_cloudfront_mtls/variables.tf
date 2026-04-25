@@ -44,7 +44,7 @@ variable "trust_store_bucket_arns" {
 }
 
 variable "lambda_layer_arn" {
-  description = "Lambda layer with cryptography and requests (e.g. prBotSecurityLibrary). Required when create is true; may be null when create is false."
+  description = "Full ARN of the Lambda layer *version* to attach (include the trailing :<version>). Prefer the layer stack output (e.g. aws_lambda_layer) so the version always exists. Do not use a data source with a guessed version number."
   type        = string
   default     = null
   nullable    = true

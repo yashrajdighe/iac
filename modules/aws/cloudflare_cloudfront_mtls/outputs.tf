@@ -47,3 +47,15 @@ output "create" {
   description = "Whether the module created rotator resources."
   value       = var.create
 }
+
+output "lambda_layer_arn" {
+  description = "Lambda layer version ARN attached (var.lambda_layer_arn)."
+  value       = var.create ? var.lambda_layer_arn : null
+}
+
+output "lambda_layer_version" {
+  description = "Numeric version from the end of var.lambda_layer_arn (Lambda layer version suffix)."
+  value = var.create && var.lambda_layer_arn != null ? tonumber(
+    element(split(":", var.lambda_layer_arn), length(split(":", var.lambda_layer_arn)) - 1)
+  ) : null
+}
