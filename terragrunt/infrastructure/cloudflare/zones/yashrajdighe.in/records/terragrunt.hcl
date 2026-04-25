@@ -3,7 +3,7 @@ include "root" {
   expose = true
 }
 
-dependency "my_portfolio" {
+dependency "my_portfolio_development" {
   config_path = "../../../../aws/development/north-virginia/my-portfolio"
 
   mock_outputs = {
@@ -13,6 +13,17 @@ dependency "my_portfolio" {
   # Merge mocks into existing state so new root outputs (not yet in state) do not break parsing.
   mock_outputs_merge_strategy_with_state = "shallow"
 }
+
+dependency "my_portfolio_staging" {
+  config_path = "../../../../aws/staging/north-virginia/my-portfolio"
+
+  mock_outputs = {
+    cloudfront_distribution_domain_name = "d111111abcdef8.cloudfront.net"
+  }
+
+  mock_outputs_merge_strategy_with_state = "shallow"
+}
+
 
 dependency "yd_acm_cert_development" {
   config_path = "../../../../aws/development/north-virginia/yd_acm_cert"
@@ -100,7 +111,13 @@ inputs = {
     "my-portfolio-dev" = {
       name    = "dev"
       type    = "CNAME"
-      content = dependency.my_portfolio.outputs.cloudfront_distribution_domain_name
+      content = dependency.my_portfolio_development.outputs.cloudfront_distribution_domain_name
+      proxied = true
+    }
+    "my-portfolio-staging" = {
+      name    = "staging"
+      type    = "CNAME"
+      content = dependency.my_portfolio_staging.outputs.cloudfront_distribution_domain_name
       proxied = true
     }
     "*-yashrajdighe-in-cert-verification-development" = {
