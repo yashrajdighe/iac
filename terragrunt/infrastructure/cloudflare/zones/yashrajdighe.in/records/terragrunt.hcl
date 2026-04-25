@@ -14,8 +14,73 @@ dependency "my_portfolio" {
   mock_outputs_merge_strategy_with_state = "shallow"
 }
 
+dependency "yd_acm_cert_development" {
+  config_path = "../../../../aws/development/north-virginia/yd_acm_cert"
+
+  mock_outputs = {
+    domain_validation_options = [
+      {
+        domain_name           = "*.yashrajdighe.in"
+        resource_record_name  = "_mock-dev.acm-validations.aws"
+        resource_record_type  = "CNAME"
+        resource_record_value = "mock-dev.acm-validations.aws"
+      }
+    ]
+  }
+
+  # Merge mocks into existing state so new root outputs (not yet in state) do not break parsing.
+  mock_outputs_merge_strategy_with_state = "shallow"
+}
+
+dependency "yd_acm_cert_staging" {
+  config_path = "../../../../aws/staging/north-virginia/yd_acm_cert"
+
+  mock_outputs = {
+    domain_validation_options = [
+      {
+        domain_name           = "*.yashrajdighe.in"
+        resource_record_name  = "_mock-stg.acm-validations.aws"
+        resource_record_type  = "CNAME"
+        resource_record_value = "mock-stg.acm-validations.aws"
+      }
+    ]
+  }
+
+  # Merge mocks into existing state so new root outputs (not yet in state) do not break parsing.
+  mock_outputs_merge_strategy_with_state = "shallow"
+}
+
+dependency "yd_acm_cert_production" {
+  config_path = "../../../../aws/production/north-virginia/yd_acm_cert"
+
+  mock_outputs = {
+    domain_validation_options = [
+      {
+        domain_name           = "*.yashrajdighe.in"
+        resource_record_name  = "_mock-prod-wild.acm-validations.aws"
+        resource_record_type  = "CNAME"
+        resource_record_value = "mock-prod-wild.acm-validations.aws"
+      },
+      {
+        domain_name           = "yashrajdighe.in"
+        resource_record_name  = "_mock-prod-apex.acm-validations.aws"
+        resource_record_type  = "CNAME"
+        resource_record_value = "mock-prod-apex.acm-validations.aws"
+      }
+    ]
+  }
+
+  # Merge mocks into existing state so new root outputs (not yet in state) do not break parsing.
+  mock_outputs_merge_strategy_with_state = "shallow"
+}
+
 dependencies {
-  paths = ["../../../../aws/development/north-virginia/my-portfolio"]
+  paths = [
+    "../../../../aws/development/north-virginia/my-portfolio",
+    "../../../../aws/development/north-virginia/yd_acm_cert",
+    "../../../../aws/staging/north-virginia/yd_acm_cert",
+    "../../../../aws/production/north-virginia/yd_acm_cert",
+  ]
 }
 
 terraform {
@@ -36,6 +101,61 @@ inputs = {
       type    = "CNAME"
       content = dependency.my_portfolio.outputs.cloudfront_distribution_domain_name
       proxied = true
+    }
+    "*-yashrajdighe-in-cert-verification-development" = {
+      name = one(
+        tolist(dependency.yd_acm_cert_development.outputs.domain_validation_options)
+      ).resource_record_name
+      type = one(
+        tolist(dependency.yd_acm_cert_development.outputs.domain_validation_options)
+      ).resource_record_type
+      content = one(
+        tolist(dependency.yd_acm_cert_development.outputs.domain_validation_options)
+      ).resource_record_value
+      proxied = false
+    }
+    "*-yashrajdighe-in-cert-verification-staging" = {
+      name = one(
+        tolist(dependency.yd_acm_cert_staging.outputs.domain_validation_options)
+      ).resource_record_name
+      type = one(
+        tolist(dependency.yd_acm_cert_staging.outputs.domain_validation_options)
+      ).resource_record_type
+      content = one(
+        tolist(dependency.yd_acm_cert_staging.outputs.domain_validation_options)
+      ).resource_record_value
+      proxied = false
+    }
+    # Production cert lists apex + wildcard; DVOs are selected by domain_name (set order is not stable).
+    "*-yashrajdighe-in-cert-verification-production" = {
+      name = one([
+        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
+        if o.domain_name == "*.yashrajdighe.in"
+      ]).resource_record_name
+      type = one([
+        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
+        if o.domain_name == "*.yashrajdighe.in"
+      ]).resource_record_type
+      content = one([
+        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
+        if o.domain_name == "*.yashrajdighe.in"
+      ]).resource_record_value
+      proxied = false
+    }
+    "*-yashrajdighe-in-cert-verification-production-apex" = {
+      name = one([
+        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
+        if o.domain_name == "yashrajdighe.in"
+      ]).resource_record_name
+      type = one([
+        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
+        if o.domain_name == "yashrajdighe.in"
+      ]).resource_record_type
+      content = one([
+        for o in tolist(dependency.yd_acm_cert_production.outputs.domain_validation_options) : o
+        if o.domain_name == "yashrajdighe.in"
+      ]).resource_record_value
+      proxied = false
     }
   }
 }
