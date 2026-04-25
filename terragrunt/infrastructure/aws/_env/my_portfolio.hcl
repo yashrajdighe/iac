@@ -23,7 +23,8 @@ inputs = {
 
   create_mtls_trust_store = true
   mtls_rotator_account_id = "530354880605"
-  mtls_rotator_role_name  = "cloudflare-origin-cert-rotator-role"
+  # Must match the rotator Lambda IAM role name = {resource_name_prefix}{function_name}-role (see cloudflare-origin-cert-rotator terragrunt)
+  mtls_rotator_role_name = "devops-playground-in-cloudflare-origin-cert-rotator-role"
   # Must match rotator: default S3 key is {normalized resource_name_prefix}root-ca.pem (e.g. devops-playground-in-root-ca.pem) unless trust_store is overridden
   mtls_trust_store_object_key = "devops-playground-in-root-ca.pem"
 }
