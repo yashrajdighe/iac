@@ -63,7 +63,8 @@ inputs = {
   ]
 
   # trust_store_s3_object_key: omit to use default; object key is derived from _env/mtls_rotator_shared.hcl (keep in sync with my-portfolio)
-  # lambda_layer_name: module default (prBotSecurityLibrary) — latest version resolved at apply
+  lambda_layer_name    = "prBotSecurityLibrary"
+  lambda_layer_version = 1
 
   # Short-lived values for testing (revert to e.g. 30 / 3650 / 120 for production)
   client_cert_validity_days = 2

@@ -6,7 +6,7 @@ check "create_requires_inputs" {
       coalesce(var.lambda_layer_name, "") != "" &&
       length(var.trust_store_bucket_arns) > 0
     )
-    error_message = "When create is true, set non-empty cloudflare_zone_id, cloudflare_api_token_secret_arn, lambda_layer_name, and at least one trust_store_bucket_arn."
+    error_message = "When create is true, set non-empty cloudflare_zone_id, cloudflare_api_token_secret_arn, lambda_layer_name, and at least one trust_store_bucket_arn. Use lambda_layer_version for the published layer version."
   }
 
   assert {
