@@ -12,29 +12,29 @@ dependency "lambda_layer" {
   mock_outputs_merge_strategy_with_state = "shallow"
 }
 
-dependency "my_portfolio_development" {
-  config_path = "../../../development/north-virginia/my-portfolio"
+dependency "mtls_trust_store_development" {
+  config_path = "../../../development/mumbai/devops-playground-mtls-trust-store"
 
   mock_outputs = {
-    mtls_trust_store_bucket_arn = "arn:aws:s3:::mock-mtls-trust-dev"
+    bucket_arn = "arn:aws:s3:::mock-mtls-trust-dev"
   }
   mock_outputs_merge_strategy_with_state = "shallow"
 }
 
-dependency "my_portfolio_staging" {
-  config_path = "../../../staging/north-virginia/my-portfolio"
+dependency "mtls_trust_store_staging" {
+  config_path = "../../../staging/mumbai/devops-playground-mtls-trust-store"
 
   mock_outputs = {
-    mtls_trust_store_bucket_arn = "arn:aws:s3:::mock-mtls-trust-stg"
+    bucket_arn = "arn:aws:s3:::mock-mtls-trust-stg"
   }
   mock_outputs_merge_strategy_with_state = "shallow"
 }
 
-dependency "my_portfolio_production" {
-  config_path = "../../../production/north-virginia/my-portfolio"
+dependency "mtls_trust_store_production" {
+  config_path = "../../../production/mumbai/devops-playground-mtls-trust-store"
 
   mock_outputs = {
-    mtls_trust_store_bucket_arn = "arn:aws:s3:::mock-mtls-trust-prd"
+    bucket_arn = "arn:aws:s3:::mock-mtls-trust-prd"
   }
   mock_outputs_merge_strategy_with_state = "shallow"
 }
@@ -42,9 +42,9 @@ dependency "my_portfolio_production" {
 dependencies {
   paths = [
     "../lambda-layer",
-    "../../../development/north-virginia/my-portfolio",
-    "../../../staging/north-virginia/my-portfolio",
-    "../../../production/north-virginia/my-portfolio",
+    "../../../development/mumbai/devops-playground-mtls-trust-store",
+    "../../../staging/mumbai/devops-playground-mtls-trust-store",
+    "../../../production/mumbai/devops-playground-mtls-trust-store",
   ]
 }
 
@@ -59,7 +59,7 @@ locals {
 }
 
 inputs = {
-  create               = false
+  create               = true
   resource_name_prefix = local.mtls_rotator.locals.mtls_resource_name_prefix
   function_name        = local.mtls_rotator.locals.mtls_function_name
 
@@ -68,12 +68,12 @@ inputs = {
   cloudflare_api_token_secret_arn = local.mtls_rotator.locals.cloudflare_api_token_secret_arn
 
   trust_store_bucket_arns = [
-    dependency.my_portfolio_development.outputs.mtls_trust_store_bucket_arn,
-    dependency.my_portfolio_staging.outputs.mtls_trust_store_bucket_arn,
-    dependency.my_portfolio_production.outputs.mtls_trust_store_bucket_arn,
+    dependency.mtls_trust_store_development.outputs.bucket_arn,
+    dependency.mtls_trust_store_staging.outputs.bucket_arn,
+    dependency.mtls_trust_store_production.outputs.bucket_arn,
   ]
 
-  # trust_store_s3_object_key: omit to use default; object key is derived from _env/mtls_rotator_shared.hcl (keep in sync with my-portfolio)
+  # trust_store_s3_object_key: omit to use default; object key is derived from _env/mtls_rotator_shared.hcl (keep in sync with the trust-store buckets)
   # Layer version: use published ARN from the lambda-layer stack (do not hardcode :1; version must exist in the account).
   lambda_layer_arn = dependency.lambda_layer.outputs.layer_arn
 
