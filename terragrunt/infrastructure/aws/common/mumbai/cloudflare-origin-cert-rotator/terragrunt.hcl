@@ -59,6 +59,7 @@ locals {
 }
 
 inputs = {
+  create               = false
   resource_name_prefix = local.mtls_rotator.locals.mtls_resource_name_prefix
   function_name        = local.mtls_rotator.locals.mtls_function_name
 
