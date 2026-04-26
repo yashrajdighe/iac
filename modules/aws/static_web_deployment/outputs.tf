@@ -32,13 +32,3 @@ output "origin_access_control_id" {
   description = "ID of the CloudFront Origin Access Control"
   value       = try(aws_cloudfront_origin_access_control.this[0].id, null)
 }
-
-output "mtls_trust_store_bucket_name" {
-  description = "S3 bucket name for the mTLS root CA trust store (root-ca.pem), if create_mtls_trust_store is true."
-  value       = try(aws_s3_bucket.mtls_trust_store[0].id, null)
-}
-
-output "mtls_trust_store_bucket_arn" {
-  description = "S3 bucket ARN for the mTLS root CA trust store, if create_mtls_trust_store is true."
-  value       = try(aws_s3_bucket.mtls_trust_store[0].arn, null)
-}

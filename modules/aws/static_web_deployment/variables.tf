@@ -105,39 +105,3 @@ variable "kms_key_arn" {
   type        = string
   default     = ""
 }
-
-variable "create_mtls_trust_store" {
-  description = "If true, create a dedicated S3 bucket for the Cloudflare origin mTLS root CA (root-ca.pem) and allow the rotator role to Put/Get the object (cross-account)."
-  type        = bool
-  default     = false
-}
-
-variable "mtls_rotator_account_id" {
-  description = "AWS account ID of the org common account that runs the Cloudflare origin cert rotator Lambda (for bucket policy principal)."
-  type        = string
-  default     = ""
-}
-
-variable "mtls_rotator_role_name" {
-  description = "IAM role *name* only (not the full ARN), for the rotator Lambda in the common account. Must match the deployed role: if the rotator uses resource_name_prefix, the name is {prefix}{function_name}-role (e.g. devops-playground-in-cloudflare-origin-cert-rotator-role). Mismatches cause S3 PutBucketPolicy errors like Invalid principal."
-  type        = string
-  default     = ""
-}
-
-variable "mtls_trust_store_bucket_name" {
-  description = "Override S3 bucket name for mTLS root CA. If empty, static_web_deployment_name-mtls-trust-store is used (see local.mtls_trust_store_name)."
-  type        = string
-  default     = ""
-}
-
-variable "mtls_trust_store_object_key" {
-  description = "S3 object key for the root CA public PEM. Must match the common-account rotator module input trust_store_s3_object_key."
-  type        = string
-  default     = "root-ca.pem"
-}
-
-variable "mtls_trust_store_attach_rotator_policy" {
-  description = "If true (and create_mtls_trust_store is true), attach the bucket policy for the cross-account rotator role. The IAM role must already exist in mtls_rotator_account_id, or S3 returns MalformedPolicy/Invalid principal. If the rotator stack is not applied yet, set this false, apply, then apply cloudflare-origin-cert-rotator, then set this true and apply again."
-  type        = bool
-  default     = true
-}

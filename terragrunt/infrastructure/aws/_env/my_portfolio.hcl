@@ -2,12 +2,6 @@ terraform {
   source = "${find_in_parent_folders("modules")}/aws/static_web_deployment"
 }
 
-locals {
-  mtls_rotator = read_terragrunt_config(
-    find_in_parent_folders("_env/mtls_rotator_shared.hcl", "${get_terragrunt_dir()}/terragrunt.hcl")
-  )
-}
-
 inputs = {
   create_static_web_deployment   = true
   enable_cloudfront_distribution = true
