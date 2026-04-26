@@ -5,6 +5,7 @@
 locals {
   cloudflare_api_token_secret_arn = "arn:aws:secretsmanager:ap-south-1:530354880605:secret:/common/github/yashrajdighe/iac/CLOUDFLARE_API_TOKEN-eefAwH"
 
+  mtls_rotator_account_id   = "530354880605"
   mtls_resource_name_prefix = "devops-playground-in"
   mtls_function_name        = "cloudflare-origin-cert-rotator"
 

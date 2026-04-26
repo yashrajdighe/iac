@@ -16,6 +16,12 @@ variable "tags" {
   default     = {}
 }
 
+variable "bucket_policy_json" {
+  description = "Optional JSON policy to attach to the S3 bucket."
+  type        = string
+  default     = ""
+}
+
 variable "enable_retention" {
   description = "enable retention on this bucket"
   type        = bool
