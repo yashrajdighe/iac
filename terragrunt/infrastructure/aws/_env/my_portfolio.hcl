@@ -25,12 +25,5 @@ inputs = {
   }
 
   default_root_object             = "index.html"
-  cloudflare_api_token_secret_arn = local.mtls_rotator.locals.cloudflare_api_token_secret_arn
-
-  create_mtls_trust_store     = true
-  mtls_rotator_account_id     = "530354880605"
-  mtls_rotator_role_name      = local.mtls_rotator.locals.mtls_rotator_role_name
-  mtls_trust_store_object_key = local.mtls_rotator.locals.mtls_trust_store_object_key
-  # Cross-account S3 policy fails with MalformedPolicy/Invalid principal if the rotator role does not exist in the common account yet. Bootstrap: set false, apply this stack, apply common/mumbai/cloudflare-origin-cert-rotator, set true, apply this stack again.
-  mtls_trust_store_attach_rotator_policy = true
+  cloudflare_api_token_secret_arn = "arn:aws:secretsmanager:ap-south-1:530354880605:secret:/common/github/yd-devops-hub/global/CLOUDFLARE_API_TOKEN-VjcxZF"
 }
