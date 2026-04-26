@@ -40,6 +40,10 @@ override.tf.json
 terraform.rc
 .venv
 
+# Terragrunt (generated; do not commit)
+**/.terragrunt-source-manifest
+.terragrunt-cache/
+
 # Python
 **/__pycache__/
 *.py[cod]
