@@ -9,6 +9,7 @@ terraform {
 
 inputs = {
   zone_id = include.root.locals.hierarchy.zone.zone_id
+  tg_path = include.root.locals.tg_path
   records = {
     "test-iac" = {
       name    = "test-iac"
