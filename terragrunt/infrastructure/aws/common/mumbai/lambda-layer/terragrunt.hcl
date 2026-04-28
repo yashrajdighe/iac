@@ -10,5 +10,5 @@ inputs = {
   layer_name          = "prBotSecurityLibrary"
   source_path         = "./prBotSecurityLibrary"
   compatible_runtimes = ["python3.14"]
-  description         = "Shared layer containing HMAC verification logic and compiled dependencies (requests, pyjwt, cryptography)."
+  description         = "Shared layer (packages under python/ per Lambda layout): requests, pyjwt, cryptography, security helpers."
 }

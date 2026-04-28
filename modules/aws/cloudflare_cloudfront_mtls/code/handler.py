@@ -1,6 +1,7 @@
 """
 Cloudflare origin mTLS: custom root CA + client cert, secrets, S3 trust-store, Cloudflare API.
-Uses the Lambda layer: cryptography, requests (boto3 is in the runtime).
+Uses the Lambda layer for cryptography and requests (boto3 is in the runtime). The layer ZIP must
+use the AWS layout with packages under python/ so they resolve under /opt/python.
 """
 
 from __future__ import annotations
