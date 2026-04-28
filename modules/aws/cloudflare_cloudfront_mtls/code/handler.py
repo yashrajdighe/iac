@@ -284,6 +284,7 @@ def _put_root_pem_s3(cert_pem: str) -> None:
 
 def _put_secret(arn: str, payload: str) -> None:
     sm.put_secret_value(SecretId=arn, SecretString=payload)
+    log.info("Secrets Manager updated (PutSecretValue ok): %s", arn)
 
 
 def _list_origin_client_auth_ids(token: str) -> list[str]:
@@ -377,8 +378,13 @@ def lambda_handler(event, context) -> dict:  # noqa: ARG001
         else:
             log.info("Rotating root CA (expired or within automatic renew-before window)")
         root = _build_root_ca()
-        _put_secret(ROOT_ARN, json.dumps(root))
-        _put_root_pem_s3(root["cert_pem"])
+        _put_secret(ROOT_CA_ARN, json.dumps(root))
+        try:
+            _put_root_pem_s3(root["cert_pem"])
+        except Exception:
+            log.exception(
+                "Trust store S3 upload failed (root CA PEM is already in Secrets Manager)"
+            )
         root_ca_rotated = True
     else:
         log.info("Reusing root CA; skipping S3 trust store re-upload (%s)", TRUST_STORE_S3_KEY)
@@ -391,6 +397,13 @@ def lambda_handler(event, context) -> dict:  # noqa: ARG001
     old_cf_id = old_meta.get("cloudflare_cert_id")
 
     cl = _sign_client_cert(ca_cert, ca_key)
+    client_payload: dict[str, Any] = {
+        "cert_pem": cl["cert_pem"],
+        "key_pem": cl["key_pem"],
+    }
+    # Persist before Cloudflare API calls so Secrets Manager still gets PEM material if CF errors.
+    _put_secret(CLIENT_ARN, json.dumps(client_payload))
+
     new_id = _post_origin_client_auth(token, cl["cert_pem"], cl["key_pem"])
     if not new_id:
         ids = _list_origin_client_auth_ids(token)
@@ -407,13 +420,9 @@ def lambda_handler(event, context) -> dict:  # noqa: ARG001
     if old_cf_id and new_id and str(old_cf_id) != str(new_id):
         _delete_origin_client_auth(token, str(old_cf_id))
 
-    to_save: dict = {
-        "cert_pem": cl["cert_pem"],
-        "key_pem": cl["key_pem"],
-    }
     if new_id:
-        to_save["cloudflare_cert_id"] = new_id
-    _put_secret(CLIENT_ARN, json.dumps(to_save))
+        client_payload["cloudflare_cert_id"] = new_id
+        _put_secret(CLIENT_ARN, json.dumps(client_payload))
     _set_authenticated_origin_pulls(token)
     return {
         "ok": True,
