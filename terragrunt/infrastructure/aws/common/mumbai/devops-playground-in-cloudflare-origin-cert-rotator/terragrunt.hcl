@@ -54,7 +54,7 @@ terraform {
 
 locals {
   mtls_rotator = read_terragrunt_config(
-    find_in_parent_folders("_env/mtls_rotator_shared.hcl", "${get_terragrunt_dir()}/terragrunt.hcl")
+    find_in_parent_folders("_env/mtls_rotator_devops_playground_in.hcl", "${get_terragrunt_dir()}/terragrunt.hcl")
   )
 }
 
@@ -75,7 +75,7 @@ inputs = {
     dependency.mtls_trust_store_production.outputs.bucket_arn,
   ]
 
-  # trust_store_s3_object_key: omit to use default; object key is derived from _env/mtls_rotator_shared.hcl (keep in sync with the trust-store buckets)
+  # trust_store_s3_object_key: omit to use default; object key is derived from _env/mtls_rotator_devops_playground_in.hcl (keep in sync with the trust-store buckets)
   # Layer version: use published ARN from the lambda-layer stack (do not hardcode :1; version must exist in the account).
   lambda_layer_arn = dependency.lambda_layer.outputs.layer_arn
 
