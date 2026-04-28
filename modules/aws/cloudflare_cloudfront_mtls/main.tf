@@ -90,6 +90,7 @@ resource "aws_lambda_function" "this" {
   environment {
     variables = {
       CLOUDFLARE_ZONE_ID              = var.cloudflare_zone_id
+      CLOUDFLARE_ZONE_NAME            = coalesce(var.cloudflare_zone_name, "")
       CLOUDFLARE_API_TOKEN_SECRET_ARN = var.cloudflare_api_token_secret_arn
       ROOT_CA_SECRET_ARN              = aws_secretsmanager_secret.root_ca[0].arn
       CLIENT_CERT_SECRET_ARN          = aws_secretsmanager_secret.client[0].arn

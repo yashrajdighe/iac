@@ -25,7 +25,10 @@ from cryptography.x509.oid import ExtendedKeyUsageOID, NameOID
 log = logging.getLogger()
 log.setLevel(logging.INFO)
 
-ZONE_ID = os.environ["CLOUDFLARE_ZONE_ID"]
+# Strip whitespace/newlines — env or CI can introduce trailing \n and break URLs.
+ZONE_ID = os.environ["CLOUDFLARE_ZONE_ID"].strip()
+# If set (e.g. example.com), used for AOP cert subject; avoids GET /zones/{id} (needs Zone read).
+ZONE_NAME_ENV = (os.environ.get("CLOUDFLARE_ZONE_NAME") or "").strip()
 TOKEN_ARN = os.environ["CLOUDFLARE_API_TOKEN_SECRET_ARN"]
 ROOT_CA_ARN = os.environ["ROOT_CA_SECRET_ARN"]
 CLIENT_ARN = os.environ["CLIENT_CERT_SECRET_ARN"]
@@ -40,19 +43,61 @@ s3 = boto3.client("s3")
 CF = "https://api.cloudflare.com/client/v4"
 
 
+_TOKEN_KEYS = (
+    "token",
+    "api_token",
+    "apiToken",
+    "CLOUDFLARE_API_TOKEN",
+    "cloudflare_api_token",
+    "value",
+)
+
+
+def _clean_token(raw: str) -> str:
+    """Strip whitespace/newlines/wrapping quotes; reject any internal whitespace.
+
+    Cloudflare tokens are alphanumeric plus '_' / '-'. Any tab/newline inside the
+    Authorization header value yields HTTP 400 'Invalid format for Authorization header'
+    (Cloudflare error code 6111).
+    """
+    t = raw.strip()
+    if len(t) >= 2 and t[0] == t[-1] and t[0] in ('"', "'"):
+        t = t[1:-1].strip()
+    if not t:
+        raise RuntimeError("Cloudflare API token is empty after sanitization.")
+    if any(c.isspace() for c in t):
+        raise RuntimeError(
+            "Cloudflare API token contains whitespace/newline characters; check the secret value."
+        )
+    return t
+
+
 def _get_cf_token() -> str:
     r = sm.get_secret_value(SecretId=TOKEN_ARN)
     s = r.get("SecretString")
     if s:
         j = s.strip()
         if j.startswith("{"):
-            d = json.loads(j)
-            if "token" in d:
-                return str(d["token"])
-        return s.strip()
+            try:
+                d = json.loads(j)
+            except json.JSONDecodeError as e:
+                raise RuntimeError(
+                    f"Cloudflare API token secret is not valid JSON: {e.msg}"
+                ) from e
+            if not isinstance(d, dict):
+                raise RuntimeError(
+                    "Cloudflare API token secret JSON must be an object with a token field."
+                )
+            for k in _TOKEN_KEYS:
+                if k in d and isinstance(d[k], str) and d[k].strip():
+                    return _clean_token(d[k])
+            raise RuntimeError(
+                f"Cloudflare API token secret JSON is missing one of {_TOKEN_KEYS!r}."
+            )
+        return _clean_token(s)
     b = r.get("SecretBinary")
     if b:
-        return base64.b64decode(b).decode("utf-8").strip()
+        return _clean_token(base64.b64decode(b).decode("utf-8"))
     raise RuntimeError("Cloudflare API token secret is empty or unsupported format.")
 
 
@@ -63,14 +108,36 @@ def _cf_headers(token: str) -> dict[str, str]:
     }
 
 
+def _cf_headers_get(token: str) -> dict[str, str]:
+    """GET requests: do not send Content-Type; some APIs (including Cloudflare) may 400 otherwise."""
+    return {"Authorization": f"Bearer {token}"}
+
+
 def _cf_get(token: str, path: str) -> dict[str, Any]:
     r = requests.get(
         f"{CF}/zones/{ZONE_ID}{path}",
-        headers=_cf_headers(token),
+        headers=_cf_headers_get(token),
         timeout=60,
     )
+    if r.status_code >= 400:
+        log.error("Cloudflare GET %s: %s", path or "/", r.text)
     r.raise_for_status()
     return r.json()
+
+
+def _get_zone_apex_name(token: str) -> str:
+    """Zone apex (e.g. example.com) for AOP cert subject per CF docs."""
+    if ZONE_NAME_ENV:
+        log.info("Using CLOUDFLARE_ZONE_NAME from environment: %s", ZONE_NAME_ENV)
+        return ZONE_NAME_ENV
+    j = _cf_get(token, "")
+    res = j.get("result")
+    if not isinstance(res, dict):
+        raise RuntimeError("Cloudflare GET /zones/{zone_id}: missing result.")
+    name = res.get("name")
+    if not name or not isinstance(name, str):
+        raise RuntimeError("Cloudflare zone: missing result.name.")
+    return name.strip()
 
 
 def _cf_json(
@@ -91,14 +158,18 @@ def _cf_json(
     return r.json() if (r.text and r.content) else {}
 
 
-def _set_authenticated_origin_pulls(token: str) -> None:
+def _enable_zone_level_aop(token: str) -> None:
+    """
+    Zone-level custom AOP must use this endpoint — not PATCH /settings/authenticated_origin_pulls
+    (that path is separate from global / legacy toggles per Cloudflare docs).
+    """
     _cf_json(
-        "PATCH",
+        "PUT",
         token,
-        "/settings/authenticated_origin_pulls",
-        {"value": "on"},
+        "/origin_tls_client_auth/settings",
+        {"enabled": True},
     )
-    log.info("Authenticated origin pulls: on")
+    log.info("Zone-level origin TLS client auth enabled (origin_tls_client_auth/settings)")
 
 
 def _load_root_from_sm() -> dict | None:
@@ -121,11 +192,10 @@ def _load_root_from_sm() -> dict | None:
     return None
 
 
-def _build_root_ca() -> dict:
+def _build_root_ca(zone_apex: str) -> dict:
     k = rsa.generate_private_key(public_exponent=65537, key_size=4096)
-    name = x509.Name(
-        [x509.NameAttribute(NameOID.COMMON_NAME, "Custom-Cloudflare-Origin-CA")]
-    )
+    # Zone-level AOP docs: CA CN should be the domain (apex), not an arbitrary label.
+    name = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, zone_apex)])
     now = datetime.now(timezone.utc)
     c = (
         x509.CertificateBuilder()
@@ -165,19 +235,18 @@ def _build_root_ca() -> dict:
 
 
 def _sign_client_cert(
-    ca_cert: x509.Certificate, ca_key: Any
+    ca_cert: x509.Certificate, ca_key: Any, zone_apex: str
 ) -> dict:
     k = rsa.generate_private_key(public_exponent=65537, key_size=2048)
-    subj = x509.Name(
-        [x509.NameAttribute(NameOID.COMMON_NAME, "cloudflare-origin-pull")]
-    )
+    # Zone-level AOP docs: leaf CN should be a hostname for the zone (use apex).
+    subj = x509.Name([x509.NameAttribute(NameOID.COMMON_NAME, zone_apex)])
     csr = (
         x509.CertificateSigningRequestBuilder()
         .subject_name(subj)
         .sign(k, hashes.SHA256())
     )
     now = datetime.now(timezone.utc)
-    serial = int(uuid.uuid4().int & (1 << 64) - 1)
+    serial = max(1, int(uuid.uuid4().int & ((1 << 64) - 1)))
     cert = (
         x509.CertificateBuilder()
         .subject_name(csr.subject)
@@ -206,12 +275,18 @@ def _sign_client_cert(
         .add_extension(
             x509.ExtendedKeyUsage([ExtendedKeyUsageOID.CLIENT_AUTH]), critical=False
         )
+        .add_extension(
+            x509.SubjectAlternativeName([x509.DNSName(zone_apex)]),
+            critical=False,
+        )
         .sign(ca_key, hashes.SHA256())
     )
+    # Cloudflare origin_tls_client_auth expects PEM in Traditional RSA form
+    # (BEGIN RSA PRIVATE KEY), not PKCS#8 (BEGIN PRIVATE KEY); PKCS#8 often yields 400.
     return {
         "key_pem": k.private_bytes(
             encoding=serialization.Encoding.PEM,
-            format=serialization.PrivateFormat.PKCS8,
+            format=serialization.PrivateFormat.TraditionalOpenSSL,
             encryption_algorithm=serialization.NoEncryption(),
         ).decode("utf-8"),
         "cert_pem": cert.public_bytes(serialization.Encoding.PEM).decode("utf-8"),
@@ -361,6 +436,10 @@ def lambda_handler(event, context) -> dict:  # noqa: ARG001
         raise RuntimeError("TRUST_STORE_BUCKET_NAMES is empty.")
 
     token = _get_cf_token()
+    # Don't log the value — only its shape — to surface secret-format issues without leaking it.
+    log.info("Cloudflare token loaded: length=%d", len(token))
+    zone_apex = _get_zone_apex_name(token)
+    log.info("Cloudflare zone apex for AOP cert subject: %s", zone_apex)
 
     existing_root = _load_root_from_sm()
     need_new_root = (
@@ -377,7 +456,7 @@ def lambda_handler(event, context) -> dict:  # noqa: ARG001
             log.info("Rotating root CA (force_root_ca_rotation=true)")
         else:
             log.info("Rotating root CA (expired or within automatic renew-before window)")
-        root = _build_root_ca()
+        root = _build_root_ca(zone_apex)
         _put_secret(ROOT_CA_ARN, json.dumps(root))
         try:
             _put_root_pem_s3(root["cert_pem"])
@@ -396,7 +475,9 @@ def lambda_handler(event, context) -> dict:  # noqa: ARG001
     old_meta = _load_client_meta()
     old_cf_id = old_meta.get("cloudflare_cert_id")
 
-    cl = _sign_client_cert(ca_cert, ca_key)
+    _enable_zone_level_aop(token)
+
+    cl = _sign_client_cert(ca_cert, ca_key, zone_apex)
     client_payload: dict[str, Any] = {
         "cert_pem": cl["cert_pem"],
         "key_pem": cl["key_pem"],
@@ -423,7 +504,6 @@ def lambda_handler(event, context) -> dict:  # noqa: ARG001
     if new_id:
         client_payload["cloudflare_cert_id"] = new_id
         _put_secret(CLIENT_ARN, json.dumps(client_payload))
-    _set_authenticated_origin_pulls(token)
     return {
         "ok": True,
         "root_ca_rotated": root_ca_rotated,

@@ -63,7 +63,9 @@ inputs = {
   resource_name_prefix = local.mtls_rotator.locals.mtls_resource_name_prefix
   function_name        = local.mtls_rotator.locals.mtls_function_name
 
-  cloudflare_zone_id = "35382e17c94bbbeedef73e026144798f" # devops-playground.in
+  cloudflare_zone_id = "35382e17c94bbbeedef73e026144798f"
+  # Skips GET /zones/{id} (avoids Zone read on token and avoids 400s some tokens get on that GET).
+  cloudflare_zone_name = "devops-playground.in"
 
   cloudflare_api_token_secret_arn = local.mtls_rotator.locals.cloudflare_api_token_secret_arn
 

@@ -23,6 +23,13 @@ variable "cloudflare_zone_id" {
   nullable    = true
 }
 
+variable "cloudflare_zone_name" {
+  description = "Zone apex hostname (e.g. example.com). If set, the rotator uses it for AOP cert CN/SAN and skips GET /zones/{id}, which requires Zone read on the API token. Recommended for tokens scoped only to SSL/certificates."
+  type        = string
+  default     = null
+  nullable    = true
+}
+
 variable "cloudflare_api_token_secret_arn" {
   description = "Secrets Manager secret ARN for CLOUDFLARE_API_TOKEN in the same account (common). Required when create is true; may be null when create is false."
   type        = string
