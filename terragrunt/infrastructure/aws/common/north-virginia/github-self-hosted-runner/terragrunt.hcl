@@ -1,0 +1,65 @@
+include "root" {
+  path   = find_in_parent_folders()
+  expose = true
+}
+
+generate "provider_aws_mumbai" {
+  path      = "provider_aws_mumbai.tf"
+  if_exists = "overwrite_terragrunt"
+  contents = templatefile(find_in_parent_folders("_shared/providers/aws_alias.tftpl"), {
+    alias       = "mumbai"
+    aws_region  = "ap-south-1"
+    platform    = include.root.locals.hierarchy.cfg.platform
+    project     = include.root.locals.hierarchy.cfg.project
+    creator     = include.root.locals.hierarchy.cfg.creator
+    team        = include.root.locals.hierarchy.cfg.team
+    environment = include.root.locals.hierarchy.env.env
+    iam_role    = include.root.locals.hierarchy.account.iam_role
+    tg_path     = path_relative_to_include()
+  })
+}
+
+dependency "vpc" {
+  config_path = "../vpc"
+
+  mock_outputs = {
+    vpc_id = "vpc-mock0000000000000"
+    private_subnets = [
+      "subnet-mockaaaaaaaa",
+      "subnet-mockbbbbbbbb",
+      "subnet-mockcccccccc",
+    ]
+  }
+  mock_outputs_merge_strategy_with_state = "shallow"
+}
+
+dependencies {
+  paths = ["../vpc"]
+}
+
+terraform {
+  source = "${find_in_parent_folders("modules")}/aws/aws_self_hosted_runner"
+}
+
+locals {
+  runner = read_terragrunt_config(find_in_parent_folders("_env/github_self_hosted_runner_common.hcl"))
+}
+
+inputs = {
+  aws_region         = include.root.locals.hierarchy.region.aws_region
+  vpc_id             = dependency.vpc.outputs.vpc_id
+  private_subnet_ids = dependency.vpc.outputs.private_subnets
+
+  github_app_private_key_secret_arn             = local.runner.locals.github_app_private_key_secret_arn
+  github_app_id_ssm_parameter_name              = local.runner.locals.github_app_id_ssm_parameter_name
+  github_webhook_secret_arn                     = local.runner.locals.github_webhook_secret_arn
+  github_app_installation_id_ssm_parameter_name = local.runner.locals.github_app_installation_id_ssm_parameter_name
+
+  repository_white_list = local.runner.locals.repository_white_list
+  prefix                = local.runner.locals.runner_prefix
+
+  instance_types                 = ["c5.large", "m5.large"]
+  instance_target_capacity_type  = "spot"
+  enable_ephemeral_runners       = true
+  scale_down_schedule_expression = "cron(*/5 * * * ? *)"
+}
