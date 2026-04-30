@@ -46,6 +46,17 @@ variable "prefix" {
   default     = "github-actions"
 }
 
+variable "runner_root_volume_size_gb" {
+  description = "Root EBS volume size (GiB) for runner instances (gp3)."
+  type        = number
+  default     = 30
+
+  validation {
+    condition     = var.runner_root_volume_size_gb >= 30 && var.runner_root_volume_size_gb <= 16384
+    error_message = "runner_root_volume_size_gb must be between 30 and 16384 GiB."
+  }
+}
+
 variable "instance_types" {
   description = "EC2 instance types for the runner fleet."
   type        = list(string)

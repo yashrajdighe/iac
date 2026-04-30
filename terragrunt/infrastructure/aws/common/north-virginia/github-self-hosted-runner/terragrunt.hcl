@@ -43,6 +43,7 @@ inputs = {
   prefix                = local.runner.locals.runner_prefix
 
   instance_types                 = ["c5.large", "m5.large"]
+  runner_root_volume_size_gb     = 100
   instance_target_capacity_type  = "spot"
   enable_ephemeral_runners       = true
   scale_down_schedule_expression = "cron(*/5 * * * ? *)"

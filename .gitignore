@@ -1,7 +1,7 @@
 # Local .terraform directories
 **/.terraform/*
 
-# Provider lock files (OpenTofu/Terraform) — ignore in all directories
+# Provider lock files (OpenTofu/Terraform) — ignore in all directories (not tracked in Git)
 **/.terraform.lock.hcl
 
 # .tfstate files

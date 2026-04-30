@@ -49,7 +49,10 @@ module "github_runners" {
     }
   }
 
-  instance_types                  = var.instance_types
+  instance_types = var.instance_types
+  block_device_mappings = [{
+    volume_size = var.runner_root_volume_size_gb
+  }]
   instance_target_capacity_type   = var.instance_target_capacity_type
   enable_ephemeral_runners        = var.enable_ephemeral_runners
   repository_white_list           = var.repository_white_list
