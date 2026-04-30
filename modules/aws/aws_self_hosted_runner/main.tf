@@ -20,6 +20,9 @@ data "aws_ssm_parameter" "github_app_installation_id" {
 }
 
 locals {
+  upstream_runner_semver                     = "6.10.1"
+  upstream_runner_lambda_artifacts_directory = "${path.module}/lambda_artifacts/${local.upstream_runner_semver}"
+
   create_service_linked_role_spot = coalesce(
     var.create_service_linked_role_spot,
     var.instance_target_capacity_type == "spot",
@@ -28,17 +31,16 @@ locals {
 
 module "github_runners" {
   source  = "github-aws-runners/github-runner/aws"
-  version = "6.10.1"
+  version = local.upstream_runner_semver
 
   aws_region = var.aws_region
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnet_ids
 
-  # Registry module source ships TypeScript sources only; Lambda packages must come from
-  # release assets matching this exact version — see Terragrunt before_hook downloading to .lambda-dist/
-  webhook_lambda_zip                = "${path.module}/.lambda-dist/webhook.zip"
-  runners_lambda_zip                = "${path.module}/.lambda-dist/runners.zip"
-  runner_binaries_syncer_lambda_zip = "${path.module}/.lambda-dist/runner-binaries-syncer.zip"
+  # Vendored from https://github.com/github-aws-runners/terraform-aws-github-runner/releases (registry module has no zips).
+  webhook_lambda_zip                = "${local.upstream_runner_lambda_artifacts_directory}/webhook.zip"
+  runners_lambda_zip                = "${local.upstream_runner_lambda_artifacts_directory}/runners.zip"
+  runner_binaries_syncer_lambda_zip = "${local.upstream_runner_lambda_artifacts_directory}/runner-binaries-syncer.zip"
 
   github_app = {
     key_base64     = data.aws_secretsmanager_secret_version.github_app_key.secret_string
