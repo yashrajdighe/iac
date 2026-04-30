@@ -37,12 +37,22 @@ dependencies {
   paths = ["../vpc"]
 }
 
-terraform {
-  source = "${find_in_parent_folders("modules")}/aws/aws_self_hosted_runner"
+locals {
+  runner                    = read_terragrunt_config(find_in_parent_folders("_env/github_self_hosted_runner_common.hcl"))
+  github_runner_release_tag = local.runner.locals.github_runner_release_tag
 }
 
-locals {
-  runner = read_terragrunt_config(find_in_parent_folders("_env/github_self_hosted_runner_common.hcl"))
+terraform {
+  source = "${find_in_parent_folders("modules")}/aws/aws_self_hosted_runner"
+
+  before_hook "download_github_runner_lambdas" {
+    commands = ["init", "plan", "apply", "import", "refresh", "destroy"]
+    execute = [
+      "bash",
+      "-c",
+      "exec \"${get_repo_root()}/modules/aws/aws_self_hosted_runner/scripts/download-lambdas.sh\" \"${local.github_runner_release_tag}\"",
+    ]
+  }
 }
 
 inputs = {

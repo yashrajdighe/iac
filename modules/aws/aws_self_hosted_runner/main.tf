@@ -28,11 +28,17 @@ locals {
 
 module "github_runners" {
   source  = "github-aws-runners/github-runner/aws"
-  version = "~> 6.0"
+  version = "6.10.1"
 
   aws_region = var.aws_region
   vpc_id     = var.vpc_id
   subnet_ids = var.private_subnet_ids
+
+  # Registry module source ships TypeScript sources only; Lambda packages must come from
+  # release assets matching this exact version — see Terragrunt before_hook downloading to .lambda-dist/
+  webhook_lambda_zip                = "${path.module}/.lambda-dist/webhook.zip"
+  runners_lambda_zip                = "${path.module}/.lambda-dist/runners.zip"
+  runner_binaries_syncer_lambda_zip = "${path.module}/.lambda-dist/runner-binaries-syncer.zip"
 
   github_app = {
     key_base64     = data.aws_secretsmanager_secret_version.github_app_key.secret_string

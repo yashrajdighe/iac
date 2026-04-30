@@ -21,5 +21,5 @@ output "webhook_endpoint" {
 output "github_app_installation_id_from_ssm" {
   description = "Installation ID from SSM when github_app_installation_id_ssm_parameter_name was set (upstream module derives installs from the app; this is for reference)."
   value       = try(data.aws_ssm_parameter.github_app_installation_id[0].value, null)
-  sensitive   = false
+  sensitive   = true
 }

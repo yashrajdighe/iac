@@ -44,6 +44,9 @@ terraform.rc
 **/.terragrunt-source-manifest
 .terragrunt-cache/
 
+# github-aws-runners Lambda bundles (downloaded by Terragrunt hook; versions pinned with the module)
+modules/aws/aws_self_hosted_runner/.lambda-dist/
+
 # Python
 **/__pycache__/
 *.py[cod]
