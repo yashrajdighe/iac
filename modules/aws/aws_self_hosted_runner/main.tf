@@ -60,4 +60,7 @@ module "github_runners" {
   prefix                          = var.prefix
   create_service_linked_role_spot = local.create_service_linked_role_spot
   tags                            = var.tags
+
+  # Default upstream is 1; that reserves capacity and can fail when unreserved concurrency would drop below 10.
+  scale_up_reserved_concurrent_executions = var.scale_up_reserved_concurrent_executions
 }
