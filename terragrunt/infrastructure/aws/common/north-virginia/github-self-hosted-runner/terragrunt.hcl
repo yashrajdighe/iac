@@ -3,22 +3,6 @@ include "root" {
   expose = true
 }
 
-generate "provider_aws_mumbai" {
-  path      = "provider_aws_mumbai.tf"
-  if_exists = "overwrite_terragrunt"
-  contents = templatefile(find_in_parent_folders("_shared/providers/aws_alias.tftpl"), {
-    alias       = "mumbai"
-    aws_region  = "ap-south-1"
-    platform    = include.root.locals.hierarchy.cfg.platform
-    project     = include.root.locals.hierarchy.cfg.project
-    creator     = include.root.locals.hierarchy.cfg.creator
-    team        = include.root.locals.hierarchy.cfg.team
-    environment = include.root.locals.hierarchy.env.env
-    iam_role    = include.root.locals.hierarchy.account.iam_role
-    tg_path     = path_relative_to_include()
-  })
-}
-
 dependency "vpc" {
   config_path = "../vpc"
 

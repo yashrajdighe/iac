@@ -19,12 +19,12 @@ variable "github_app_private_key_secret_arn" {
 }
 
 variable "github_app_id_ssm_parameter_name" {
-  description = "SSM parameter name or full parameter ARN for the GitHub App ID (credentials region; API accepts either)."
+  description = "SSM parameter name or full parameter ARN for the GitHub App ID (same AWS region as aws_region / default provider)."
   type        = string
 }
 
 variable "github_webhook_secret_arn" {
-  description = "Secrets Manager secret ARN (or id) for the GitHub App webhook secret (credentials region)."
+  description = "Secrets Manager secret ARN (or id) for the GitHub App webhook secret (same region as aws_region)."
   type        = string
 }
 
