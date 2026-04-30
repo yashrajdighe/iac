@@ -1,22 +1,18 @@
 data "aws_secretsmanager_secret_version" "github_app_key" {
-  provider  = aws.mumbai
   secret_id = var.github_app_private_key_secret_arn
 }
 
 data "aws_ssm_parameter" "github_app_id" {
-  provider = aws.mumbai
-  name     = var.github_app_id_ssm_parameter_name
+  name = var.github_app_id_ssm_parameter_name
 }
 
 data "aws_secretsmanager_secret_version" "github_webhook_secret" {
-  provider  = aws.mumbai
   secret_id = var.github_webhook_secret_arn
 }
 
 data "aws_ssm_parameter" "github_app_installation_id" {
-  count    = var.github_app_installation_id_ssm_parameter_name != null ? 1 : 0
-  provider = aws.mumbai
-  name     = var.github_app_installation_id_ssm_parameter_name
+  count = var.github_app_installation_id_ssm_parameter_name != null ? 1 : 0
+  name  = var.github_app_installation_id_ssm_parameter_name
 }
 
 locals {
@@ -43,6 +39,7 @@ module "github_runners" {
   runners_lambda_zip                = "${local.upstream_runner_lambda_artifacts_directory}/runners.zip"
   runner_binaries_syncer_lambda_zip = "${local.upstream_runner_lambda_artifacts_directory}/runner-binaries-syncer.zip"
 
+  # Secrets/SSM are in var.aws_region (default provider); Lambdas use the same region for GetParameter.
   github_app = {
     key_base64     = data.aws_secretsmanager_secret_version.github_app_key.secret_string
     webhook_secret = data.aws_secretsmanager_secret_version.github_webhook_secret.secret_string
