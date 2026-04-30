@@ -75,6 +75,15 @@ variable "scale_down_schedule_expression" {
   default     = "cron(*/5 * * * ? *)"
 }
 
+variable "scale_up_reserved_concurrent_executions" {
+  description = <<-EOT
+    Reserved executions for the scale-up Lambda (-1 = no reservation, shares account unreserved capacity).
+    A positive value can trigger InvalidParameterValueException if unreserved concurrent executions would fall below 10.
+  EOT
+  type        = number
+  default     = -1
+}
+
 variable "create_service_linked_role_spot" {
   description = "Create AWSServiceRoleForEC2Spot; defaults to true when instance_target_capacity_type is spot."
   type        = bool
