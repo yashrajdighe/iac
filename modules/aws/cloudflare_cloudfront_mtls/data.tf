@@ -1,3 +1,15 @@
+# Resolves the canonical secret ARN (incl. random suffix) for import; aws_secretsmanager_secret
+# import IDs must be ARNs in AWS provider v6+.
+data "aws_secretsmanager_secret" "import_root_ca" {
+  count = var.create && var.import_existing_secretsmanager_secrets ? 1 : 0
+  name  = "${local.secret_name_stem}/root-ca"
+}
+
+data "aws_secretsmanager_secret" "import_client_cert" {
+  count = var.create && var.import_existing_secretsmanager_secrets ? 1 : 0
+  name  = "${local.secret_name_stem}/client-cert"
+}
+
 data "aws_iam_policy_document" "lambda_assume_role" {
   statement {
     actions = ["sts:AssumeRole"]
