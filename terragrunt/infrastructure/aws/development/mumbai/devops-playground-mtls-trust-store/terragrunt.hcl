@@ -8,7 +8,7 @@ terraform {
 
 locals {
   mtls_rotator = read_terragrunt_config(
-    find_in_parent_folders("_env/mtls_rotator_shared.hcl", "${get_terragrunt_dir()}/terragrunt.hcl")
+    find_in_parent_folders("_env/mtls_rotator_devops_playground_in.hcl", "${get_terragrunt_dir()}/terragrunt.hcl")
   )
 
   bucket_name = "devops-playground-in-development-mtls-trust-store"
