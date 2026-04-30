@@ -1,0 +1,17 @@
+provider "aws" {
+  alias  = "${alias}"
+  region = "${aws_region}"
+  default_tags {
+    tags = {
+      platform    = "${platform}"
+      project     = "${project}"
+      creator     = "${creator}"
+      team        = "${team}"
+      environment = "${environment}"
+      tg_path     = "${tg_path}"
+    }
+  }
+  assume_role {
+    role_arn = "${iam_role}"
+  }
+}
