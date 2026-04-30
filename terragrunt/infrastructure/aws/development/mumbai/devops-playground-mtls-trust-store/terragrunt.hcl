@@ -18,21 +18,21 @@ locals {
 inputs = {
   name = local.bucket_name
 
-  bucket_policy_json = jsonencode({
-    Version = "2012-10-17"
-    Statement = [
-      {
-        Sid    = "AllowCloudflareOriginCertRotator"
-        Effect = "Allow"
-        Principal = {
-          AWS = "arn:aws:iam::${local.mtls_rotator.locals.mtls_rotator_account_id}:role/${local.mtls_rotator.locals.mtls_rotator_role_name}"
-        }
-        Action = [
-          "s3:GetObject",
-          "s3:PutObject",
-        ]
-        Resource = "arn:aws:s3:::${local.bucket_name}/${local.mtls_rotator.locals.mtls_trust_store_object_key}"
-      }
-    ]
-  })
+  # bucket_policy_json = jsonencode({
+  #   Version = "2012-10-17"
+  #   Statement = [
+  #     {
+  #       Sid    = "AllowCloudflareOriginCertRotator"
+  #       Effect = "Allow"
+  #       Principal = {
+  #         AWS = "arn:aws:iam::${local.mtls_rotator.locals.mtls_rotator_account_id}:role/${local.mtls_rotator.locals.mtls_rotator_role_name}"
+  #       }
+  #       Action = [
+  #         "s3:GetObject",
+  #         "s3:PutObject",
+  #       ]
+  #       Resource = "arn:aws:s3:::${local.bucket_name}/${local.mtls_rotator.locals.mtls_trust_store_object_key}"
+  #     }
+  #   ]
+  # })
 }
