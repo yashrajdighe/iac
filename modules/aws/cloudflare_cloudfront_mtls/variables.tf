@@ -109,6 +109,12 @@ variable "secret_name_prefix" {
   default     = "cloudflare-origin-mtls"
 }
 
+variable "import_existing_secretsmanager_secrets" {
+  description = "If true, import pre-existing Secrets Manager secrets for root-ca and client-cert into state on the next apply. Set when secrets already exist (ResourceExistsException). Leave false for new stacks."
+  type        = bool
+  default     = false
+}
+
 variable "tags" {
   type        = map(string)
   default     = {}
