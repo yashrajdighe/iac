@@ -40,8 +40,8 @@ dependencies {
 locals {
   runner                    = read_terragrunt_config(find_in_parent_folders("_env/github_self_hosted_runner_common.hcl"))
   github_runner_release_tag = local.runner.locals.github_runner_release_tag
-  # get_repo_root() runs git rev-parse and fails under dubious ownership (CI/Docker). Resolve from this file instead.
-  github_runner_lambda_download_script = "${get_terragrunt_dir()}/../../../../../modules/aws/aws_self_hosted_runner/scripts/download-lambdas.sh"
+  # Hooks run from .terragrunt-cache subdirs where get_terragrunt_dir() is too deep — anchor on _env file in the checkout.
+  github_runner_lambda_download_script = "${dirname(find_in_parent_folders("_env/github_self_hosted_runner_common.hcl"))}/../../../../modules/aws/aws_self_hosted_runner/scripts/download-lambdas.sh"
 }
 
 terraform {
