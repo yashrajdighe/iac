@@ -46,6 +46,27 @@ variable "prefix" {
   default     = "github-actions"
 }
 
+variable "block_device_mappings" {
+  description = "Root EBS volumes for runner instances (passed through to github-aws-runners)."
+  type = list(object({
+    delete_on_termination = optional(bool, true)
+    device_name           = optional(string, "/dev/xvda")
+    encrypted             = optional(bool, true)
+    iops                  = optional(number)
+    kms_key_id            = optional(string)
+    snapshot_id           = optional(string)
+    throughput            = optional(number)
+    volume_size           = number
+    volume_type           = optional(string, "gp3")
+  }))
+  default = [{
+    volume_size = 100
+    volume_type = "gp3"
+    iops        = 6000
+    throughput  = 500
+  }]
+}
+
 variable "instance_types" {
   description = "EC2 instance types for the runner fleet."
   type        = list(string)

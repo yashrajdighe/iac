@@ -49,6 +49,7 @@ module "github_runners" {
     }
   }
 
+  block_device_mappings           = var.block_device_mappings
   instance_types                  = var.instance_types
   instance_target_capacity_type   = var.instance_target_capacity_type
   enable_ephemeral_runners        = var.enable_ephemeral_runners
