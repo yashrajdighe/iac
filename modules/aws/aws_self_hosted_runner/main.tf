@@ -20,8 +20,9 @@ data "aws_ssm_parameter" "github_app_installation_id" {
 }
 
 locals {
-  upstream_runner_semver                     = "6.10.1"
-  upstream_runner_lambda_artifacts_directory = "${path.module}/lambda_artifacts/${local.upstream_runner_semver}"
+  upstream_runner_semver = "6.10.1"
+  # Artifacts directory name matches the upstream release tag (vX.Y.Z), separate from the registry version (X.Y.Z).
+  upstream_runner_lambda_artifacts_directory = "${path.module}/lambda_artifacts/v${local.upstream_runner_semver}"
 
   create_service_linked_role_spot = coalesce(
     var.create_service_linked_role_spot,
