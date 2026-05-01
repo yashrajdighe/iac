@@ -1,0 +1,84 @@
+---
+###############################################################################
+# Cloud Build pipeline that builds and pushes the four control-plane images.
+#
+# Trigger from CI on changes under `modules/gcp/github-runner-gcp/services/`
+# with substitutions:
+#   _REPO         e.g. asia-south1-docker.pkg.dev/<project>/<ar-repo>
+#   _MODULE_VER   e.g. 0.1.0
+#
+# After a successful run, run `make digests REPO=$_REPO MODULE_VER=$_MODULE_VER`
+# from this directory to write the resolved digests into a new
+# `image_digests_<MODULE_VER>.auto.tfvars`. Bump
+# locals.control_plane_images in main.tf to those digests in the same PR.
+###############################################################################
+
+steps:
+  - id: webhook
+    name: gcr.io/cloud-builders/docker
+    args:
+      [
+        "build",
+        "-f",
+        "webhook/Dockerfile",
+        "-t",
+        "${_REPO}/webhook:${_MODULE_VER}",
+        "-t",
+        "${_REPO}/webhook:${SHORT_SHA}",
+        ".",
+      ]
+  - id: scale-up
+    name: gcr.io/cloud-builders/docker
+    args:
+      [
+        "build",
+        "-f",
+        "scale-up/Dockerfile",
+        "-t",
+        "${_REPO}/scale-up:${_MODULE_VER}",
+        "-t",
+        "${_REPO}/scale-up:${SHORT_SHA}",
+        ".",
+      ]
+  - id: scale-down
+    name: gcr.io/cloud-builders/docker
+    args:
+      [
+        "build",
+        "-f",
+        "scale-down/Dockerfile",
+        "-t",
+        "${_REPO}/scale-down:${_MODULE_VER}",
+        "-t",
+        "${_REPO}/scale-down:${SHORT_SHA}",
+        ".",
+      ]
+  - id: runner-binaries-syncer
+    name: gcr.io/cloud-builders/docker
+    args:
+      [
+        "build",
+        "-f",
+        "runner-binaries-syncer/Dockerfile",
+        "-t",
+        "${_REPO}/runner-binaries-syncer:${_MODULE_VER}",
+        "-t",
+        "${_REPO}/runner-binaries-syncer:${SHORT_SHA}",
+        ".",
+      ]
+
+images:
+  - "${_REPO}/webhook:${_MODULE_VER}"
+  - "${_REPO}/webhook:${SHORT_SHA}"
+  - "${_REPO}/scale-up:${_MODULE_VER}"
+  - "${_REPO}/scale-up:${SHORT_SHA}"
+  - "${_REPO}/scale-down:${_MODULE_VER}"
+  - "${_REPO}/scale-down:${SHORT_SHA}"
+  - "${_REPO}/runner-binaries-syncer:${_MODULE_VER}"
+  - "${_REPO}/runner-binaries-syncer:${SHORT_SHA}"
+
+options:
+  logging: CLOUD_LOGGING_ONLY
+  machineType: E2_HIGHCPU_8
+
+timeout: "1800s"

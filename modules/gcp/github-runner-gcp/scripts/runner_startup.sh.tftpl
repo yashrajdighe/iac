@@ -1,0 +1,130 @@
+#!/usr/bin/env bash
+###############################################################################
+# Runner startup script.
+#
+# Runs as root on first boot of every ephemeral runner VM.
+#
+# Reads the JIT config + idle timeout from instance metadata, downloads the
+# cached actions/runner tarball from GCS, runs the runner under an unprivileged
+# user, and self-deletes when finished.
+#
+# An idle-timer fallback deletes the VM if no job is picked up within
+# RUNNER_IDLE_SELF_DESTRUCT_MINUTES (defends against orphaned VMs when
+# scale-down is delayed).
+###############################################################################
+
+set -euo pipefail
+
+readonly RUNNER_USER="runner"
+readonly RUNNER_HOME="/opt/actions-runner"
+readonly METADATA_URL="http://metadata.google.internal/computeMetadata/v1"
+readonly GCS_BUCKET="${runner_binaries_bucket}"
+readonly LATEST_OBJECT="${runner_binaries_latest_object}"
+
+log() { echo "[$(date -u +%FT%TZ)] $*"; }
+
+trap 'log "startup script failed (rc=$?)"; self_destruct' ERR
+
+self_destruct() {
+  local zone name
+  zone=$(curl -sf -H "Metadata-Flavor: Google" "$METADATA_URL/instance/zone" | awk -F/ '{print $NF}')
+  name=$(curl -sf -H "Metadata-Flavor: Google" "$METADATA_URL/instance/name")
+  log "self-destruct: gcloud compute instances delete $name --zone=$zone --quiet"
+  gcloud compute instances delete "$name" --zone="$zone" --quiet || true
+}
+
+# Read instance metadata.
+JIT_CONFIG=$(curl -sf -H "Metadata-Flavor: Google" "$METADATA_URL/instance/attributes/runner_jit_config")
+IDLE_MINUTES=$(curl -sf -H "Metadata-Flavor: Google" "$METADATA_URL/instance/attributes/runner_idle_self_destruct_minutes" || echo 30)
+
+if [[ -z "$JIT_CONFIG" ]]; then
+  log "no runner_jit_config attribute; aborting"
+  self_destruct
+  exit 1
+fi
+
+# Schedule the idle-timer self-destruct as a one-shot systemd unit. If the
+# runner picks up a job and exits cleanly we cancel it before reaching this
+# point; otherwise the VM removes itself.
+cat >/etc/systemd/system/runner-idle-watchdog.service <<EOF
+[Unit]
+Description=Self-destruct ephemeral runner if idle
+After=network-online.target
+
+[Service]
+Type=oneshot
+ExecStart=/usr/local/bin/runner-idle-watchdog.sh
+EOF
+cat >/etc/systemd/system/runner-idle-watchdog.timer <<EOF
+[Unit]
+Description=Trigger runner-idle-watchdog after timeout
+[Timer]
+OnBootSec=$${IDLE_MINUTES}min
+Unit=runner-idle-watchdog.service
+[Install]
+WantedBy=timers.target
+EOF
+cat >/usr/local/bin/runner-idle-watchdog.sh <<'EOF'
+#!/usr/bin/env bash
+# If a runner is currently busy, we leave it alone; otherwise self-destruct.
+set -euo pipefail
+if pgrep -f Runner.Listener >/dev/null && pgrep -f Runner.Worker >/dev/null; then
+  exit 0
+fi
+ZONE=$(curl -sf -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/zone | awk -F/ '{print $NF}')
+NAME=$(curl -sf -H "Metadata-Flavor: Google" http://metadata.google.internal/computeMetadata/v1/instance/name)
+gcloud compute instances delete "$NAME" --zone="$ZONE" --quiet
+EOF
+chmod +x /usr/local/bin/runner-idle-watchdog.sh
+systemctl daemon-reload
+systemctl enable --now runner-idle-watchdog.timer
+
+# Install dependencies (Ubuntu 22.04+/24.04).
+export DEBIAN_FRONTEND=noninteractive
+apt-get update -y
+apt-get install -y --no-install-recommends \
+  ca-certificates curl jq unzip git tar gzip libicu-dev sudo \
+  python3 python3-pip
+
+# Create runner user.
+if ! id -u "$RUNNER_USER" >/dev/null 2>&1; then
+  useradd --create-home --home-dir "/home/$RUNNER_USER" --shell /bin/bash "$RUNNER_USER"
+fi
+
+mkdir -p "$RUNNER_HOME"
+chown "$RUNNER_USER:$RUNNER_USER" "$RUNNER_HOME"
+
+# Resolve latest runner version from GCS pointer object.
+POINTER_FILE=/tmp/runner-pointer.json
+gsutil cp "gs://$GCS_BUCKET/$LATEST_OBJECT" "$POINTER_FILE"
+RUNNER_OBJECT=$(jq -r '.object' "$POINTER_FILE")
+RUNNER_SHA256=$(jq -r '.sha256' "$POINTER_FILE")
+
+TARBALL=/tmp/actions-runner.tar.gz
+gsutil cp "gs://$GCS_BUCKET/$RUNNER_OBJECT" "$TARBALL"
+
+if [[ -n "$RUNNER_SHA256" && "$RUNNER_SHA256" != "null" ]]; then
+  echo "$RUNNER_SHA256  $TARBALL" | sha256sum -c -
+fi
+
+sudo -u "$RUNNER_USER" tar -xzf "$TARBALL" -C "$RUNNER_HOME"
+
+# Configure runner via JIT (no token required, encoded config is enough).
+echo "$JIT_CONFIG" >"$RUNNER_HOME/.jit-config"
+chown "$RUNNER_USER:$RUNNER_USER" "$RUNNER_HOME/.jit-config"
+chmod 600 "$RUNNER_HOME/.jit-config"
+
+cat >"$RUNNER_HOME/run-jit.sh" <<'EOF'
+#!/usr/bin/env bash
+set -euo pipefail
+cd "$(dirname "$0")"
+./run.sh --jitconfig "$(cat .jit-config)"
+EOF
+chmod +x "$RUNNER_HOME/run-jit.sh"
+chown "$RUNNER_USER:$RUNNER_USER" "$RUNNER_HOME/run-jit.sh"
+
+# Run the runner. When it exits (ephemeral mode), self-destruct.
+sudo -u "$RUNNER_USER" "$RUNNER_HOME/run-jit.sh" || log "runner exited with status $?"
+
+systemctl stop runner-idle-watchdog.timer || true
+self_destruct

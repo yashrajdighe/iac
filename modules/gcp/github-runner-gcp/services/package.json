@@ -1,0 +1,21 @@
+{
+  "name": "github-runner-gcp-services",
+  "version": "0.1.0",
+  "private": true,
+  "description": "Cloud Run control-plane services that mirror github-aws-runners on GCP.",
+  "workspaces": [
+    "lib",
+    "webhook",
+    "scale-up",
+    "scale-down",
+    "runner-binaries-syncer"
+  ],
+  "scripts": {
+    "build": "npm run build --workspaces --if-present",
+    "lint": "npm run lint --workspaces --if-present",
+    "test": "npm run test --workspaces --if-present"
+  },
+  "engines": {
+    "node": ">=20.11"
+  }
+}
