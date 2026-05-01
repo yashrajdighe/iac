@@ -16,13 +16,11 @@ resource "google_project" "this" {
 }
 
 locals {
-  bootstrap_admin_roles = toset([
-    "roles/owner",
-    "roles/resourcemanager.folderAdmin",
-    "roles/resourcemanager.projectIamAdmin",
-  ])
+  # Project IAM only: folderAdmin applies to folders/orgs (see gcp_folder module), not projects.
+  # roles/owner often fails for external users (ORG_MUST_INVITE_EXTERNAL_OWNERS); override
+  # bootstrap_project_iam_roles if your org allows project Owner for these members.
   bootstrap_admin_bindings = {
-    for pair in setproduct(var.bootstrap_admin_members, local.bootstrap_admin_roles) :
+    for pair in setproduct(var.bootstrap_admin_members, var.bootstrap_project_iam_roles) :
     "${pair[0]}|${pair[1]}" => {
       member = pair[0]
       role   = pair[1]

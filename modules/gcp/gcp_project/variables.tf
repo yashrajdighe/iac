@@ -23,5 +23,14 @@ variable "project_id" {
 variable "bootstrap_admin_members" {
   type        = set(string)
   default     = []
-  description = "IAM members (e.g. user:person@example.com) granted roles/owner, roles/resourcemanager.folderAdmin, and roles/resourcemanager.projectIamAdmin on this project."
+  description = "IAM members (e.g. user:person@example.com) granted each role in bootstrap_project_iam_roles on this project."
+}
+
+variable "bootstrap_project_iam_roles" {
+  type = set(string)
+  default = [
+    "roles/editor",
+    "roles/resourcemanager.projectIamAdmin",
+  ]
+  description = "Project-scoped roles for bootstrap_admin_members. Do not use folder-only roles (e.g. roles/resourcemanager.folderAdmin). roles/owner may be rejected for external users unless the org allows it (ORG_MUST_INVITE_EXTERNAL_OWNERS)."
 }
