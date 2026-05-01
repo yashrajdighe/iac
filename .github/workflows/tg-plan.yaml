@@ -27,7 +27,7 @@ jobs:
   tg-plan:
     uses: yashrajdighe/github-actions-reusable-workflows/.github/workflows/tg-plan.yaml@main
     with:
-      runs_on: self-hosted
+      runs_on: iac
       disable_terragrunt_init_parallelism_one: true
       enable_oidc_debugger: false
       role_to_assume: ${{ vars.TERRAFORM_IAM_ROLE }}
