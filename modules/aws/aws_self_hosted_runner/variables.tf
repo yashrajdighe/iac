@@ -46,6 +46,23 @@ variable "prefix" {
   default     = "github-actions"
 }
 
+variable "runner_disable_default_labels" {
+  description = "When true, runners do not get default GitHub labels (self-hosted, os, arch); only runner_extra_labels are used (upstream runner_disable_default_labels)."
+  type        = bool
+  default     = true
+}
+
+variable "runner_extra_labels" {
+  description = "GitHub runner labels when default labels are disabled, or extra labels when defaults are enabled (upstream runner_extra_labels). Use runs-on in workflows that list every label here if enable_runner_workflow_job_labels_check_all is true."
+  type        = list(string)
+  default     = ["iac"]
+
+  validation {
+    condition     = var.runner_extra_labels != null && length(var.runner_extra_labels) > 0
+    error_message = "runner_extra_labels must be a non-null, non-empty list when using custom-only labels."
+  }
+}
+
 variable "block_device_mappings" {
   description = "Root EBS volumes for runner instances (passed through to github-aws-runners)."
   type = list(object({
@@ -92,6 +109,15 @@ variable "enable_ephemeral_runners" {
 
 variable "enable_job_queued_check" {
   description = "If true, scale-up calls the GitHub API and only launches when the workflow job is still queued. Reduces duplicate EC2 when ephemeral defaults would disable this (upstream enable_job_queued_check)."
+  type        = bool
+  default     = true
+}
+
+variable "enable_runner_workflow_job_labels_check_all" {
+  description = <<-EOT
+    If true, a workflow job is dispatched only when every label on the job is satisfied by the runner label set (upstream enable_runner_workflow_job_labels_check_all / webhook exactMatch).
+    If false, any single overlapping label (e.g. linux, x64) matches — GitHub-hosted jobs such as ubuntu-latest also use those labels, so they can incorrectly trigger self-hosted scale-up.
+  EOT
   type        = bool
   default     = true
 }
