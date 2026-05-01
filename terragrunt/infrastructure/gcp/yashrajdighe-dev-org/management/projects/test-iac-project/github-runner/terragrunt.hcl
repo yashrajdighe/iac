@@ -20,11 +20,14 @@
 
 # `find_in_parent_folders()` alone would resolve to ../terragrunt.hcl (the
 # test-iac-project stack), which itself includes root — Terragrunt allows only
-# one include level. Anchor on the repo-root _shared template (`gcp.tftpl`),
-# then walk up twice: dirname → `_shared/providers`, dirname again →
-# terragrunt/ where `terragrunt.hcl` lives (not `_shared/providers/terragrunt.hcl`).
+# one include level. Anchor on the repo-root _shared template (`gcp.tftpl`)
+# at `<repo>/terragrunt/_shared/providers/gcp.tftpl`, then walk up three
+# times to land on `<repo>/terragrunt/`:
+#   dirname  → `_shared/providers`
+#   dirname² → `_shared`
+#   dirname³ → `terragrunt/` (where the root `terragrunt.hcl` lives)
 include "root" {
-  path = "${dirname(dirname(find_in_parent_folders("_shared/providers/gcp.tftpl")))}/terragrunt.hcl"
+  path = "${dirname(dirname(dirname(find_in_parent_folders("_shared/providers/gcp.tftpl"))))}/terragrunt.hcl"
 }
 
 terraform {
