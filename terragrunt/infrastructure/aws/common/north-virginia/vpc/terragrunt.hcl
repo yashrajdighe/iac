@@ -8,15 +8,16 @@ terraform {
 
 inputs = {
   create_vpc = true
-  name       = "common-us-east-1"
-  cidr       = "10.64.0.0/16"
+  name       = "github-actions-common-vpc"
+  # /28 is the smallest subnet AWS allows; ~11 assignable IPs after reservations (/29 and smaller are not supported).
+  cidr            = "10.64.255.0/28"
+  azs             = ["us-east-1a"]
+  public_subnets  = ["10.64.255.0/28"]
+  private_subnets = []
 
-  azs             = ["us-east-1a", "us-east-1b", "us-east-1c"]
-  public_subnets  = ["10.64.0.0/24", "10.64.1.0/24", "10.64.2.0/24"]
-  private_subnets = ["10.64.10.0/24", "10.64.11.0/24", "10.64.12.0/24"]
+  enable_nat_gateway = false
 
-  enable_nat_gateway   = true
-  single_nat_gateway   = true
-  enable_dns_hostnames = true
-  enable_dns_support   = true
+  map_public_ip_on_launch = true
+  enable_dns_hostnames    = true
+  enable_dns_support      = true
 }

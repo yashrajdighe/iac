@@ -8,8 +8,8 @@ variable "vpc_id" {
   type        = string
 }
 
-variable "private_subnet_ids" {
-  description = "Private subnets for runner instances (each in a different AZ per upstream requirements)."
+variable "subnet_ids" {
+  description = "Subnets for runner instances (public subnets with map_public_ip_on_launch are supported)."
   type        = list(string)
 }
 
