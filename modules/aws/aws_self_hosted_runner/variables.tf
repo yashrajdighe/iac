@@ -84,6 +84,17 @@ variable "block_device_mappings" {
   }]
 }
 
+variable "runner_architecture" {
+  description = "Runner binary architecture: x64 for x86 instances, arm64 for Graviton (must match instance_types)."
+  type        = string
+  default     = "x64"
+
+  validation {
+    condition     = contains(["x64", "arm64"], var.runner_architecture)
+    error_message = "runner_architecture must be x64 or arm64."
+  }
+}
+
 variable "instance_types" {
   description = "EC2 instance types for the runner fleet."
   type        = list(string)

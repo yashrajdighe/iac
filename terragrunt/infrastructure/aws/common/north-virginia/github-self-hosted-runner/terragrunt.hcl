@@ -38,7 +38,9 @@ inputs = {
   repository_white_list = local.runner.locals.repository_white_list
   prefix                = local.runner.locals.runner_prefix
 
-  instance_types                 = ["c5.2xlarge"]
+  # Same capacity as c5.2xlarge (8 vCPU, 16 GiB); Graviton3 — runner_architecture must be arm64.
+  instance_types                 = ["c7g.2xlarge"]
+  runner_architecture            = "arm64"
   instance_target_capacity_type  = "spot"
   enable_ephemeral_runners       = true
   scale_down_schedule_expression = "cron(*/5 * * * ? *)"
