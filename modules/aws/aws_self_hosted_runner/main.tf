@@ -50,6 +50,7 @@ module "github_runners" {
   }
 
   block_device_mappings                       = var.block_device_mappings
+  runner_architecture                         = var.runner_architecture
   instance_types                              = var.instance_types
   instance_target_capacity_type               = var.instance_target_capacity_type
   runners_maximum_count                       = var.runners_maximum_count
