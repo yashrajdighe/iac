@@ -18,8 +18,12 @@
 #   4. Run `terragrunt apply`.
 ###############################################################################
 
+# `find_in_parent_folders()` alone would resolve to ../terragrunt.hcl (the
+# test-iac-project stack), which itself includes root — Terragrunt allows only
+# one include level. Anchor on the repo-root _shared template, then include
+# terragrunt/terragrunt.hcl next to it.
 include "root" {
-  path = find_in_parent_folders()
+  path = "${dirname(find_in_parent_folders("_shared/providers/gcp.tftpl"))}/terragrunt.hcl"
 }
 
 terraform {
