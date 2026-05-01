@@ -3,7 +3,7 @@ include "root" {
 }
 
 dependency "lambda_layer" {
-  config_path = "./lambda-layer"
+  config_path = "../../lambda-layer"
 
   mock_outputs = {
     layer_arn = "arn:aws:lambda:ap-south-1:000000000000:layer:prBotSecurityLibrary:1"
@@ -13,7 +13,7 @@ dependency "lambda_layer" {
 
 dependencies {
   paths = [
-    "./lambda-layer"
+    "../../lambda-layer"
   ]
 }
 
