@@ -1,0 +1,13 @@
+---
+description: Never run Terraform, OpenTofu, or Terragrunt CLI in this workspace agent.
+alwaysApply: true
+---
+
+# Terraform / OpenTofu / Terragrunt — no CLI from the agent
+
+When working with infrastructure in this repository:
+
+- **Do not** run `terraform`, `tofu`, or `terragrunt` (or wrappers around them) from the integrated terminal for **any** workflow: for example `init`, `validate`, `plan`, `apply`, `destroy`, `refresh`, `import`, `state`, `output`, `providers lock`, `terragrunt run-all`, etc.
+- **Do** change code and configuration only. If validation or a plan is needed, describe what to run and let the user or CI execute it.
+
+This avoids polluting local state, runner environments, and credentials assumptions that belong to the user’s process or pipelines.

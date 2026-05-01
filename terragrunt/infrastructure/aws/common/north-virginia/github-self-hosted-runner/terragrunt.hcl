@@ -7,12 +7,8 @@ dependency "vpc" {
   config_path = "../vpc"
 
   mock_outputs = {
-    vpc_id = "vpc-mock0000000000000"
-    private_subnets = [
-      "subnet-mockaaaaaaaa",
-      "subnet-mockbbbbbbbb",
-      "subnet-mockcccccccc",
-    ]
+    vpc_id         = "vpc-mock0000000000000"
+    public_subnets = ["subnet-mockaaaaaaaa"]
   }
   mock_outputs_merge_strategy_with_state = "shallow"
 }
@@ -30,9 +26,9 @@ terraform {
 }
 
 inputs = {
-  aws_region         = include.root.locals.hierarchy.region.aws_region
-  vpc_id             = dependency.vpc.outputs.vpc_id
-  private_subnet_ids = dependency.vpc.outputs.private_subnets
+  aws_region = include.root.locals.hierarchy.region.aws_region
+  vpc_id     = dependency.vpc.outputs.vpc_id
+  subnet_ids = dependency.vpc.outputs.public_subnets
 
   github_app_private_key_secret_arn             = local.runner.locals.github_app_private_key_secret_arn
   github_app_id_ssm_parameter_name              = local.runner.locals.github_app_id_ssm_parameter_name

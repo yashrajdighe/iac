@@ -32,7 +32,7 @@ module "github_runners" {
 
   aws_region = var.aws_region
   vpc_id     = var.vpc_id
-  subnet_ids = var.private_subnet_ids
+  subnet_ids = var.subnet_ids
 
   # Vendored from https://github.com/github-aws-runners/terraform-aws-github-runner/releases (registry module has no zips).
   webhook_lambda_zip                = "${local.upstream_runner_lambda_artifacts_directory}/webhook.zip"
