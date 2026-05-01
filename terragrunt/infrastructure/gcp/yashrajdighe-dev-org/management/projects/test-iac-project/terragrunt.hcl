@@ -22,4 +22,6 @@ inputs = {
   name       = "just-another-test-project"
   project_id = "just-another-test-project-123"
   folder_id  = dependency.gcp_folder.outputs.id
+
+  bootstrap_admin_members = ["user:yashrajdighe.dev@gmail.com"]
 }
