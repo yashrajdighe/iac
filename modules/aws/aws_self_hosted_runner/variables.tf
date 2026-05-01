@@ -90,6 +90,33 @@ variable "enable_ephemeral_runners" {
   default     = true
 }
 
+variable "enable_job_queued_check" {
+  description = "If true, scale-up calls the GitHub API and only launches when the workflow job is still queued. Reduces duplicate EC2 when ephemeral defaults would disable this (upstream enable_job_queued_check)."
+  type        = bool
+  default     = true
+}
+
+variable "runners_maximum_count" {
+  description = "Maximum number of runner instances the scale-up path will create (upstream RUNNERS_MAXIMUM_COUNT / runners_maximum_count)."
+  type        = number
+  default     = 1
+}
+
+variable "logging_retention_in_days" {
+  description = "CloudWatch Logs retention for GitHub runner Lambda log groups (upstream logging_retention_in_days)."
+  type        = number
+  default     = 14
+}
+
+variable "minimum_running_time_in_minutes" {
+  description = <<-EOT
+    Minutes a runner must be up before scale-down may terminate it when idle (upstream MINIMUM_RUNNING_TIME_IN_MINUTES).
+    Unset upstream defaults to 5 (linux) or 15 (windows). Low values risk terminating before registration completes.
+  EOT
+  type        = number
+  default     = 3
+}
+
 variable "scale_down_schedule_expression" {
   description = "EventBridge schedule for scale-down checks."
   type        = string

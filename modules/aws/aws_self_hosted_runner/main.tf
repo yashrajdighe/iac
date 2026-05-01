@@ -52,7 +52,11 @@ module "github_runners" {
   block_device_mappings           = var.block_device_mappings
   instance_types                  = var.instance_types
   instance_target_capacity_type   = var.instance_target_capacity_type
+  runners_maximum_count           = var.runners_maximum_count
+  logging_retention_in_days       = var.logging_retention_in_days
+  minimum_running_time_in_minutes = var.minimum_running_time_in_minutes
   enable_ephemeral_runners        = var.enable_ephemeral_runners
+  enable_job_queued_check         = var.enable_job_queued_check
   repository_white_list           = var.repository_white_list
   scale_down_schedule_expression  = var.scale_down_schedule_expression
   prefix                          = var.prefix
