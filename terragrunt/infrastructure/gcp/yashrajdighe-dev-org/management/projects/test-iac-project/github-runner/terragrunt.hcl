@@ -40,21 +40,20 @@ dependencies {
 }
 
 locals {
-  region  = "asia-south1"
-  project = trimprefix(dependency.project.outputs.project_id, "projects/")
+  region = "asia-south1"
 }
 
 inputs = {
-  project_id = local.project
+  project_id = dependency.project.outputs.project_id
   region     = local.region
   zones      = ["${local.region}-a", "${local.region}-b"]
 
-  network    = "projects/${local.project}/global/networks/default"
-  subnetwork = "projects/${local.project}/regions/${local.region}/subnetworks/default"
+  network    = "projects/${dependency.project.outputs.project_id}/global/networks/default"
+  subnetwork = "projects/${dependency.project.outputs.project_id}/regions/${local.region}/subnetworks/default"
 
-  github_app_id_secret_id          = "projects/${local.project}/secrets/github-app-id"
-  github_app_private_key_secret_id = "projects/${local.project}/secrets/github-app-private-key"
-  github_webhook_secret_secret_id  = "projects/${local.project}/secrets/github-webhook-secret"
+  github_app_id_secret_id          = "projects/${dependency.project.outputs.project_id}/secrets/github-app-id"
+  github_app_private_key_secret_id = "projects/${dependency.project.outputs.project_id}/secrets/github-app-private-key"
+  github_webhook_secret_secret_id  = "projects/${dependency.project.outputs.project_id}/secrets/github-webhook-secret"
 
   prefix              = "iac-runner"
   machine_types       = ["c4-standard-4"]
