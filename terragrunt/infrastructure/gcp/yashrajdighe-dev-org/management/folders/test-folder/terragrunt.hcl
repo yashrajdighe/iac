@@ -10,6 +10,4 @@ terraform {
 inputs = {
   name   = "just-another-test-folder"
   parent = "organizations/${include.root.locals.hierarchy.org.org_id}"
-
-  bootstrap_admin_members = ["user:yashrajdighe.dev@gmail.com"]
 }
