@@ -19,9 +19,3 @@ variable "project_id" {
   type        = string
   description = "Project ID of the project"
 }
-
-variable "bootstrap_admin_members" {
-  type        = set(string)
-  default     = []
-  description = "IAM members (e.g. user:person@example.com) granted roles/owner, roles/resourcemanager.folderAdmin, and roles/resourcemanager.projectIamAdmin on this project."
-}
