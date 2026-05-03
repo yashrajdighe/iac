@@ -125,17 +125,10 @@ resource "aws_iam_role" "github_actions_role" {
     policy = data.aws_iam_policy_document.s3_permissions.json
   }
   dynamic "inline_policy" {
-    for_each = var.cloudflare_api_token_secret_arn != "" ? [1] : []
+    for_each = var.cloudflare_api_token_ssm_parameter_arn != "" ? [1] : []
     content {
-      name   = "secrets-manager-access-policy"
-      policy = data.aws_iam_policy_document.secrets_manager_permissions.json
-    }
-  }
-  dynamic "inline_policy" {
-    for_each = var.kms_key_arn != "" ? [1] : []
-    content {
-      name   = "cross-account-kms-access-policy"
-      policy = data.aws_iam_policy_document.cross_account_kms_permissions[0].json
+      name   = "ssm-parameter-access-policy"
+      policy = data.aws_iam_policy_document.ssm_parameter_permissions.json
     }
   }
 }

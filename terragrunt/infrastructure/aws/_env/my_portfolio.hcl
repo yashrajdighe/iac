@@ -18,6 +18,6 @@ inputs = {
     target_origin_id = "root"
   }
 
-  default_root_object             = "index.html"
-  cloudflare_api_token_secret_arn = "arn:aws:secretsmanager:ap-south-1:530354880605:secret:/common/github/yd-devops-hub/global/CLOUDFLARE_API_TOKEN-VjcxZF"
+  default_root_object                    = "index.html"
+  cloudflare_api_token_ssm_parameter_arn = "arn:aws:ssm:ap-south-1:530354880605:parameter/common/github/yd-devops-hub/global/cloudflare-purge/CLOUDFLARE_API_TOKEN"
 }

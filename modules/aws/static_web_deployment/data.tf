@@ -53,27 +53,12 @@ data "aws_iam_policy_document" "s3_permissions" {
   }
 }
 
-data "aws_iam_policy_document" "secrets_manager_permissions" {
+data "aws_iam_policy_document" "ssm_parameter_permissions" {
   statement {
     effect = "Allow"
     actions = [
-      "secretsmanager:GetSecretValue",
-      "secretsmanager:DescribeSecret"
+      "ssm:GetParameter"
     ]
-    resources = [var.cloudflare_api_token_secret_arn]
-  }
-}
-
-data "aws_iam_policy_document" "cross_account_kms_permissions" {
-  count = var.kms_key_arn != "" ? 1 : 0
-
-  statement {
-    sid    = "AllowUseOfCrossAccountKMSKey"
-    effect = "Allow"
-    actions = [
-      "kms:Decrypt",
-      "kms:DescribeKey",
-    ]
-    resources = [var.kms_key_arn]
+    resources = [var.cloudflare_api_token_ssm_parameter_arn]
   }
 }

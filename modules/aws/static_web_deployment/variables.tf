@@ -94,14 +94,8 @@ variable "environment_name" {
   type        = string
 }
 
-variable "cloudflare_api_token_secret_arn" {
-  description = "Cloudflare API token secret arn"
-  type        = string
-  default     = ""
-}
-
-variable "kms_key_arn" {
-  description = "Cross-account KMS key ARN for decrypt access"
+variable "cloudflare_api_token_ssm_parameter_arn" {
+  description = "ARN of the SSM Parameter Store parameter holding the Cloudflare API token (e.g. arn:aws:ssm:region:account:parameter/name). When empty, no SSM permissions are attached to the GitHub Actions role."
   type        = string
   default     = ""
 }
