@@ -40,8 +40,6 @@ locals {
 
 inputs = {
   create = true
-  # Secrets already exist in ap-south-1; adopt into state so apply does not call CreateSecret again.
-  import_existing_secretsmanager_secrets = true
 
   resource_name_prefix = local.mtls_rotator.locals.mtls_resource_name_prefix
   function_name        = local.mtls_rotator.locals.mtls_function_name
